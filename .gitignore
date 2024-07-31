@@ -1,3 +1,6 @@
+# Streamlit env variables
+secrets.toml
+
 # Data
 /data/
 

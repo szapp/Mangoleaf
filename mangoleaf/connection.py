@@ -2,9 +2,7 @@
 Establish a connection to the database
 """
 
-import os
-
-from dotenv import load_dotenv
+import streamlit as st
 from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
 
@@ -27,14 +25,9 @@ class Connection:
         """Establish a connection to the Postgress database"""
         print("Establishing a connection to the database")
 
-        load_dotenv()
-
         self.connection_string = "{protocol}://{user}:{password}@{host}/{database}?{query}".format(
             protocol="postgresql+psycopg2",
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            host=os.getenv("DB_HOST_POOL"),
-            database=os.getenv("DB_DATABASE"),
+            **st.secrets.db_credentials,
             query="sslmode=require",
         )
 

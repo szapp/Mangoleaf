@@ -2,15 +2,9 @@
 Contact form
 """
 
-import os
-
 import streamlit as st
-from dotenv import load_dotenv
 
 from mangoleaf import frontend
-
-load_dotenv()
-contact_email = os.getenv("CONTACT_EMAIL")
 
 frontend.add_config()
 frontend.add_style()
@@ -31,7 +25,7 @@ Drop us a message below, and let's start a conversation!
 st.header(":mailbox: Get In Touch With Us!", anchor=False)
 
 contact_form = f"""
-<form action="https://formsubmit.co/{contact_email}" method="POST">
+<form action="https://formsubmit.co/{st.secrets.contact_form.email}" method="POST">
      <input type="hidden" name="_captcha" value="false">
      <input type="text" name="name" placeholder="Your name" required>
      <input type="email" name="email" placeholder= "Your email" required>
