@@ -37,10 +37,10 @@ def add_user_input(default_user_id):
 
 
 def make_row(heading, df, n):
-    if "anime_id" in df.columns:
-        url = "https://myanimelist.net/anime/"
+    if "author" in df.columns:
+        url = "https://isbnsearch.org/isbn/"
     else:
-        url = "https://www.goodreads.com/book/show/"
+        url = "https://myanimelist.net/anime/"
 
     st.html(f"<h2 class='row_header'>{heading}</h2>")  # Allow coloring
 
@@ -59,14 +59,15 @@ def make_row(heading, df, n):
     columns = st.columns(n)
     for col, (_, row) in zip(columns, df.iterrows()):
         with col:
-            st.html(
+            st.markdown(
                 html_element.format(
                     url=url,
                     item_id=row.iloc[0],
                     title=row.iloc[1],
                     secondary=row.iloc[2],
                     img_src=row.iloc[3],
-                )
+                ),
+                unsafe_allow_html=True,
             )
 
 
