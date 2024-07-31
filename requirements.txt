@@ -4,6 +4,7 @@ ipython
 isort
 jupyterlab
 notebook
+numpy==1.26.4
 pandas
 psycopg2
 python-dotenv
