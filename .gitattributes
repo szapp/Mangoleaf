@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+*.[sS][qQ][lL] linguist-detectable=true
+*.[sS][qQ][lL] linguist-language=SQL
+*.[sS][qQ][lL] linguist-vendored=false
