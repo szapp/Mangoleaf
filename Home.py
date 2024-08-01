@@ -21,7 +21,7 @@ recommendations to help you find your next favorite read.
 """
 )
 
-frontend.add_mixed_recommendations(n=8)
+hydrate_recommendation = frontend.add_mixed_recommendations(n=8)
 
 
 st.subheader("About Us", anchor=False)
@@ -38,3 +38,5 @@ st.markdown(
 Choose on the left if you are interested in Books or Manga and explore the recommendations!
 """
 )
+
+hydrate_recommendation()

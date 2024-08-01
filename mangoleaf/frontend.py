@@ -54,7 +54,21 @@ def add_row_header(heading, context=st):
     context.html(f"<h2 class='row_header'>{heading}</h2>")  # Allow coloring
 
 
-def make_row(df, n):
+def make_row_placeholder(n, context=st, skip=None):
+    columns = context.columns(n)
+    for i, col in enumerate(columns):
+        if i == skip:
+            continue
+        with col:
+            st.markdown(
+                """<div class="rec_element rec_element_empty">
+                    <div></div>
+                </div>""",
+                unsafe_allow_html=True,
+            )
+
+
+def make_row(df, n, context=st):
     if "author" in df.columns:
         url = "https://isbnsearch.org/isbn/"
     else:
@@ -63,7 +77,7 @@ def make_row(df, n):
     html_element = """<div class="rec_element">
         <a href="{url}{item_id}"
            rel="noopener noreferrer" target="_blank">
-            <img src="{img_src}" alt="{title}" class="rec_image">
+            <img src="{img_src}" alt="" class="rec_image">
             <div class="rec_text">
                 <p></p>
                 <p>{title}</p>
@@ -72,7 +86,7 @@ def make_row(df, n):
         </a>
     </div>"""
 
-    columns = st.columns(n)
+    columns = context.columns(n)
     for col, (_, row) in zip(columns, df.iterrows()):
         with col:
             st.markdown(
@@ -93,11 +107,10 @@ def add_recommendations(dataset, user_id, n):
 
     # First row
     add_row_header(f"Popular {dataset}")
-    with st.spinner("Loading recommendations..."):
-        df = query.popularity(n, dataset, exclude_rated_by=user_id_valid)
-        make_row(df, n)
+    first_row = st.empty()
+    make_row_placeholder(n, first_row)
 
-    # Second row (retry different items that the user has not yet rated)
+    # Second row
     title = dataset
     if user_id_valid is None:
         header = "If you like"
@@ -106,8 +119,25 @@ def add_recommendations(dataset, user_id, n):
     header += " <span class='highlight'>{title}</span> you might also like..."
     second_row_header = st.empty()
     add_row_header(header.format(title=title), second_row_header)
-    with st.spinner("Loading recommendations..."):
+    second_row = st.empty()
+    make_row_placeholder(n, second_row)
 
+    # Third row
+    add_row_header("Specifically for you")
+    third_row = st.empty()
+    if user_id is None:
+        third_row.warning("Please log in to unlock personal recommendations")
+    elif not user_id_valid:
+        third_row.warning(f"Start rating {dataset} to unlock personal recommendations")
+    else:
+        make_row_placeholder(n, third_row)
+
+    def hydrate():
+        # First row content
+        df = query.popularity(n, dataset, exclude_rated_by=user_id_valid)
+        make_row(df, n, first_row)
+
+        # Second row content
         if user_id_valid is not None:
             # Iteratate over items until a valid recommendation is found
             df = []
@@ -124,26 +154,18 @@ def add_recommendations(dataset, user_id, n):
             title = format_title(ref_item.title)
             add_row_header(header.format(title=title), second_row_header)
             df = query.item_based(ref_item.item_id, n, dataset)
+        make_row(df, n, second_row)
 
-        make_row(df, n)
-
-    # Third row
-    add_row_header("Specifically for you")
-    if user_id is None:
-        st.warning("Please log in to unlock personal recommendations")
-    elif not user_id_valid:
-        st.warning(f"Start rating {dataset} to unlock personal recommendations")
-    else:
-        with st.spinner("Loading recommendations..."):
+        # Third row content
+        if user_id_valid is not None:
             df = query.user_based(user_id_valid, n, dataset)
-        make_row(df, n)
+            make_row(df, n, third_row)
+
+    return hydrate
 
 
 def add_mixed_recommendations(n):
     n = 2 * n // 2  # Make sure n is even
-    df_books = query.popularity(n // 2, "books")
-    df_mangas = query.popularity(n // 2, "mangas")
-    rows = list(df_books.iterrows()) + [(None, None)] + list(df_mangas.iterrows())
 
     st.html(
         """<h2 class='row_header' style='display: flex; flex-direction: row;'>
@@ -154,7 +176,7 @@ def add_mixed_recommendations(n):
     )
 
     html_element = """<div class="rec_element">
-        <img src="{img_src}" alt="{title}" class="rec_image">
+        <img src="{img_src}" alt="" class="rec_image">
         <div class="rec_text">
             <p></p>
             <p>{title}</p>
@@ -163,20 +185,30 @@ def add_mixed_recommendations(n):
     </div><br>"""
 
     col_width = [1] * (n // 2) + [0.5] + [1] * (n // 2)
-    columns = st.columns(col_width)
-    for col, (_, row) in zip(columns, rows):
-        with col:
+    rec_row = st.empty()
+    make_row_placeholder(col_width, rec_row, skip=n // 2)
+
+    def hydrate():
+        df_books = query.popularity(n // 2, "books")
+        df_mangas = query.popularity(n // 2, "mangas")
+        rows = list(df_books.iterrows()) + [(None, None)] + list(df_mangas.iterrows())
+
+        columns = rec_row.columns(col_width)
+        for col, (_, row) in zip(columns, rows):
             if row is None:
                 continue
-            st.markdown(
-                html_element.format(
-                    item_id=row.iloc[0],
-                    title=row.iloc[1],
-                    secondary=row.iloc[2],
-                    img_src=row.iloc[3],
-                ),
-                unsafe_allow_html=True,
-            )
+            with col:
+                st.markdown(
+                    html_element.format(
+                        item_id=row.iloc[0],
+                        title=row.iloc[1],
+                        secondary=row.iloc[2],
+                        img_src=row.iloc[3],
+                    ),
+                    unsafe_allow_html=True,
+                )
+
+    return hydrate
 
 
 def add_sidebar_login():

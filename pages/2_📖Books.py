@@ -14,6 +14,7 @@ frontend.add_sidebar_logo()
 st.image("images/book_logo_transparent_background.png", width=530)
 
 user_info = authentication.get_user_info()
-frontend.add_recommendations("books", user_info["user_id"], n=8)
+hydrate_recommendations = frontend.add_recommendations("books", user_info["user_id"], n=8)
 
-# Example user-IDs: 114368, 95359, 104636
+# In the very end, we hydrate the recommendations
+hydrate_recommendations()
