@@ -81,8 +81,7 @@ def make_row(df, n, context=st):
         url = "https://myanimelist.net/anime/"
 
     html_element = """<div class="rec_element">
-        <a href="{url}{item_id}"
-           rel="noopener noreferrer" target="_blank">
+        <a href="{url}{item_id}" rel="noopener noreferrer" target="_blank">
             <img src="{img_src}" alt="" class="rec_image">
             <div class="rec_text">
                 <p></p>
@@ -93,8 +92,12 @@ def make_row(df, n, context=st):
     </div>"""
 
     columns = context.columns(n)
-    for col, (_, row) in zip(columns, df.iterrows()):
+    for i, col in enumerate(columns):
         with col:
+            if len(df) <= i:
+                st.html("")
+                continue
+            row = df.iloc[i]
             st.markdown(
                 html_element.format(
                     url=url,
@@ -165,13 +168,19 @@ def add_recommendations(dataset, user_id, n):
         # Third row content
         if user_id_valid is not None:
             df = query.user_based(user_id_valid, n, dataset)
-            make_row(df, n, third_row)
+            if len(df) > 0:
+                make_row(df, n, third_row)
+            else:
+                third_row.info(
+                    "**All caught up!**  \nStart rating more items to get more recommendations"
+                )
 
     return hydrate
 
 
 def add_mixed_recommendations(n):
-    n = 2 * n // 2  # Make sure n is even
+    n_half = n // 2
+    n = 2 * n_half  # Make sure n is even
 
     st.html(
         """<h2 class='row_header' style='display: flex; flex-direction: row;'>
@@ -190,13 +199,13 @@ def add_mixed_recommendations(n):
         </div>
     </div><br>"""
 
-    col_width = [1] * (n // 2) + [0.5] + [1] * (n // 2)
+    col_width = [1] * n_half + [0.5] + [1] * n_half
     rec_row = st.empty()
-    make_row_placeholder(col_width, rec_row, skip=n // 2)
+    make_row_placeholder(col_width, rec_row, skip=n_half)
 
     def hydrate():
-        df_books = query.popularity(n // 2, "books")
-        df_mangas = query.popularity(n // 2, "mangas")
+        df_books = query.popularity(n_half, "books")
+        df_mangas = query.popularity(n_half, "mangas")
         rows = list(df_books.iterrows()) + [(None, None)] + list(df_mangas.iterrows())
 
         columns = rec_row.columns(col_width)
