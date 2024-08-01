@@ -20,6 +20,10 @@ def add_style():
         st.html(f"<style>{f.read()}</style>")
 
 
+def add_sidebar_logo():
+    st.sidebar.image("images/mango_logo.png", use_column_width=True)
+
+
 def add_user_input(default_user_id):
     user_id = st.text_input(
         "User ID",

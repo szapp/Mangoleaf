@@ -1,6 +1,12 @@
-# Mango Leaf
+<div align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="images/white_logo_transparent_background.png">
+  <source media="(prefers-color-scheme: light)" srcset="images/black_logo_transparent_background.png">
+  <img alt="Mangoleaf" src="images/black_logo_transparent_background.png">
+</picture>
 
 Personal recommendations for books and mangas implemented using collaborative filtering based recommender systems
+</div>
 
 ## Contributors
 

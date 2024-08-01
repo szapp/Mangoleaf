@@ -8,6 +8,7 @@ from mangoleaf import frontend
 
 frontend.add_config()
 frontend.add_style()
+frontend.add_sidebar_logo()
 
 st.title("**We'd Love to Hear from You!**", anchor=False)
 
@@ -34,3 +35,5 @@ contact_form = f"""
 </form>
 """
 st.html(contact_form)
+
+st.image("images/mango_reading.png", width=550)
