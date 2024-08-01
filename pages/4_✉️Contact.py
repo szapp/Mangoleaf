@@ -8,6 +8,7 @@ from mangoleaf import frontend
 
 frontend.add_config()
 frontend.add_style()
+frontend.add_sidebar_login()
 frontend.add_sidebar_logo()
 
 st.title("**We'd Love to Hear from You!**", anchor=False)

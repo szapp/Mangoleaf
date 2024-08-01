@@ -4,7 +4,7 @@ Functionality for the frontend of repeated tasks
 
 import streamlit as st
 
-from mangoleaf import query
+from mangoleaf import authentication, query
 
 
 def add_config():
@@ -147,3 +147,34 @@ def add_mixed_recommendations(n):
                 ),
                 unsafe_allow_html=True,
             )
+
+
+def add_sidebar_login():
+    if authentication.is_authenticated():
+        st.sidebar.success(f"Logged in as {st.session_state['name']}")
+        if st.sidebar.button("Logout"):
+            authentication.reset()
+            st.sidebar.info("You have logged out")
+            st.rerun()
+        else:
+            st.sidebar.success("Choose between books and mangas")
+            st.sidebar.markdown("**Now you have access to other pages.**")
+    else:
+        st.sidebar.title("Login")
+
+        # Sidebar inputs for username and password
+        with st.sidebar.form("login_mask", border=False):
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            submit = st.form_submit_button("Login")
+
+        # Sidebar button for login
+        if submit:
+            if authentication.authenticate(username, password):
+                user = authentication.get_user_info()
+                st.sidebar.success(f"Welcome {user['name']}")
+                st.rerun()
+            else:
+                st.sidebar.error("Username/password is incorrect")
+
+        st.sidebar.info("Please log in to access the content")
