@@ -11,6 +11,15 @@ frontend.add_style()
 frontend.add_sidebar_login()
 frontend.add_sidebar_logo()
 
+col1, col2 = st.columns([1, 7])
+
+with col1:
+    st.image("images/mango_logo.png", width=130)
+
+# Display user profile information
+with col2:
+    st.title("**USER PROFILE**", anchor=False)
+
 # Check if the user is authenticated
 if not authentication.is_authenticated():
     st.warning("Please log in from the home page to access this page.")
@@ -18,8 +27,6 @@ if not authentication.is_authenticated():
 
 user_data = authentication.get_user_info()
 
-# Display user profile information
-st.title("User Profile", anchor=False)
 st.markdown(f"**Username:** {user_data['username']}")
 st.markdown(f"**Name:** {user_data['full_name']}")
 
