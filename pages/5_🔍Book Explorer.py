@@ -11,7 +11,12 @@ from pandas.api.types import (
     is_object_dtype,
 )
 
-from mangoleaf import Connection
+from mangoleaf import Connection, frontend
+
+frontend.add_config()
+frontend.add_style()
+frontend.add_sidebar_login()
+frontend.add_sidebar_logo()
 
 col1, col2 = st.columns([1, 7])
 
@@ -19,51 +24,12 @@ with col1:
     st.image("images/mango_logo.png", width=130)
 
 with col2:
-    st.title("**BOOK EXPLORER**")
+    st.title("**BOOK EXPLORER**", anchor=False)
 
 st.markdown(
     """
 Have a look through our book database and use filters to find what you are looking for!
 """
-)
-
-# Define CSS styles for the table
-st.markdown(
-    """
-    <style>
-    .styled-table {
-        border-collapse: collapse;
-        margin: 25px 0;
-        font-size: 0.9em;
-        font-family: sans-serif;
-        min-width: 400px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-        border-radius: 10px 10px 0 0;
-        overflow: hidden;
-    }
-    .styled-table thead tr {
-        background-color: #333333;
-        color: #ffffff;
-        text-align: left;
-    }
-    .styled-table th,
-    .styled-table td {
-        padding: 12px 15px;
-    }
-    .styled-table tbody tr {
-        border-bottom: 1px solid #dddddd;
-    }
-    .styled-table tbody tr:last-of-type {
-        border-bottom: 2px solid #009879;
-    }
-    .styled-table img {
-        width: 450px; /* Adjust this value to change image size */
-        height: auto;
-        border-radius: 5px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
 )
 
 
@@ -189,7 +155,7 @@ def display_books_with_images(
         url = f"https://isbnsearch.org/isbn/{row[id_column]}"
         img_html = (
             f"<a href='{url}' rel='noopener noreferrer' target='_blank'>"
-            f"<img src='{row[image_column]}' alt='' width='450' /></a>"
+            f"<img src='{row[image_column]}' alt='' /></a>"
         )
         return img_html
 
@@ -221,5 +187,3 @@ filtered_df = filter_dataframe(df)
 
 # Display the filtered DataFrame with clickable images
 display_books_with_images(filtered_df)
-
-st.sidebar.image("images/mango_logo.png", use_column_width=True)

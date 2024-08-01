@@ -217,3 +217,33 @@ def match_user_credentials(username, password):
 
         user_info = dict(result._mapping)
     return user_info
+
+
+def update_rating(dataset, user_id, item_id, rating):
+    """
+    Update the rating of a book or manga in the database
+
+    Parameters
+    ----------
+    dataset : {"books", "mangas"}
+        Dataset: "books" or "mangas"
+
+    user_id : int
+        ID of the user to update the rating for
+
+    item_id : str
+        ISBN or anime_id of the book or manga to update the rating for
+
+    rating : {1, 2, 3, 4, 5}
+        New rating for the book or manga
+    """
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = f"""
+        INSERT INTO {dataset}_ratings (user_id, item_id, rating)
+        VALUES (:user_id, :item_id, :rating)
+        ON CONFLICT (user_id, item_id) DO UPDATE
+        SET rating = :rating
+        """
+        connection.execute(text(query), dict(user_id=user_id, item_id=item_id, rating=rating))
+        connection.commit()

@@ -4,14 +4,14 @@ Manga explorer page
 
 import pandas as pd
 import streamlit as st
-from pandas.api.types import (
-    is_categorical_dtype,
-    is_datetime64_any_dtype,
-    is_numeric_dtype,
-    is_object_dtype,
-)
+from pandas.api.types import is_numeric_dtype
 
-from mangoleaf import Connection
+from mangoleaf import Connection, authentication, frontend, query
+
+frontend.add_config()
+frontend.add_style()
+frontend.add_sidebar_login()
+frontend.add_sidebar_logo()
 
 col1, col2 = st.columns([1, 7])
 
@@ -19,51 +19,12 @@ with col1:
     st.image("images/mango_logo.png", width=130)
 
 with col2:
-    st.title("**MANGA EXPLORER**")
+    st.title("**MANGA EXPLORER**", anchor=False)
 
 st.markdown(
     """
 Have a look through our manga database and use filters to find what you are looking for!
 """
-)
-
-# Define CSS styles for the table
-st.markdown(
-    """
-    <style>
-    .styled-table {
-        border-collapse: collapse;
-        margin: 25px 0;
-        font-size: 0.9em;
-        font-family: sans-serif;
-        min-width: 400px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-        border-radius: 10px 10px 0 0;
-        overflow: hidden;
-    }
-    .styled-table thead tr {
-        background-color: #333333;
-        color: #ffffff;
-        text-align: left;
-    }
-    .styled-table th,
-    .styled-table td {
-        padding: 12px 15px;
-    }
-    .styled-table tbody tr {
-        border-bottom: 1px solid #dddddd;
-    }
-    .styled-table tbody tr:last-of-type {
-        border-bottom: 2px solid #009879;
-    }
-    .styled-table img {
-        width: 450px; /* Adjust this value to change image size */
-        height: auto;
-        border-radius: 5px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
 )
 
 
@@ -81,27 +42,9 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     df : pd.DataFrame
         Filtered DataFrame
     """
-    modify = st.checkbox("Add filters", key="add_filters_checkbox")
-
-    if not modify:
-        return df
-
     df = df.copy()
 
-    # Try to standardize datetimes (datetime, no timezone)
-    for col in df.columns:
-        if is_object_dtype(df[col]):
-            try:
-                df[col] = pd.to_datetime(df[col])
-            except Exception:
-                pass
-
-        if is_datetime64_any_dtype(df[col]):
-            df[col] = df[col].dt.tz_localize(None)
-
-    modification_container = st.container()
-
-    with modification_container:
+    with st.container(border=True):
         # Define which columns can be filtered
         selectable_columns = [
             "title",
@@ -109,20 +52,12 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             # "Rank",
             # "Score",
             "other_title",
-        ]  # Example columns, adjust as needed
+        ]
 
-        # Ensure selectable_columns are in df
-        selectable_columns = [col for col in selectable_columns if col in df.columns]
-
-        # Use selectable_columns for multiselect
-        to_filter_columns = st.multiselect(
-            "Filter Manga on", selectable_columns, key="filter_columns_multiselect"
-        )
-        for column in to_filter_columns:
-            left, right = st.columns((1, 20))
+        for column in selectable_columns:
             # Treat columns with < 10 unique values as categorical
-            if is_categorical_dtype(df[column]) or df[column].nunique() < 10:
-                user_cat_input = right.multiselect(
+            if isinstance(df[column], pd.CategoricalDtype) or df[column].nunique() < 10:
+                user_cat_input = st.multiselect(
                     f"Values for {column}",
                     df[column].unique(),
                     default=list(df[column].unique()),
@@ -133,7 +68,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                 _min = float(df[column].min())
                 _max = float(df[column].max())
                 step = (_max - _min) / 100
-                user_num_input = right.slider(
+                user_num_input = st.slider(
                     f"Values for {column}",
                     min_value=_min,
                     max_value=_max,
@@ -142,22 +77,11 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
                     key=f"{column}_num_slider",
                 )
                 df = df[df[column].between(*user_num_input)]
-            elif is_datetime64_any_dtype(df[column]):
-                user_date_input = right.date_input(
-                    f"Values for {column}",
-                    value=(
-                        df[column].min(),
-                        df[column].max(),
-                    ),
-                    key=f"{column}_date_input",
-                )
-                if len(user_date_input) == 2:
-                    user_date_input = tuple(map(pd.to_datetime, user_date_input))
-                    start_date, end_date = user_date_input
-                    df = df.loc[df[column].between(start_date, end_date)]
             else:
-                user_text_input = right.text_input(
-                    f"Substring or regex in {column}", key=f"{column}_text_input"
+                column_desc = column.replace("_", " ").capitalize()
+                user_text_input = st.text_input(
+                    f"Search {column_desc}",
+                    key=f"{column}_text_input"
                 )
                 if user_text_input:
                     df = df[df[column].astype(str).str.contains(user_text_input)]
@@ -165,62 +89,65 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def display_manga_with_images(
-    df: pd.DataFrame, image_column: str = "image", id_column: str = "item_id"
-):
-    """
-    Display the DataFrame with images using clickable links to the anime
-    pages.
+user_id = authentication.get_user_info()["user_id"]
 
-    Parameters
-    ----------
-    df : pd.DataFrame
-        DataFrame to display
 
-    image_column : str
-        The column in the DataFrame that contains image URLs
-
-    id_column : str
-        The column in the DataFrame that contains the unique IDs
-    """
-
-    # Generate HTML with clickable images for display
-    def generate_clickable_image_html(row):
-        url = f"https://myanimelist.net/anime/{row[id_column]}"
-        img_html = (
-            f"<a href='{url}' rel='noopener noreferrer' target='_blank'>"
-            f"<img src='{row[image_column]}' alt='' width='450' /></a>"
-        )
-        return img_html
-
-    # Add a new column for clickable images
-    df["image"] = df.apply(generate_clickable_image_html, axis=1)
-
-    # Display the DataFrame with clickable images using HTML
-    df_html = df.to_html(
-        escape=False,
-        columns=[
-            "item_id",
-            "title",
-            "other_title",
-            # "Genres",
-            # "Rank",
-            # "Score",
-            "image",
-        ],
-        index=False,
-    )
-    df_html = df_html.replace("<table", '<table class="styled-table"')
-    st.markdown(df_html, unsafe_allow_html=True)
+def update_rating(item_id, rating_before, key):
+    rating = st.session_state.get(key, None)
+    if rating is not None:
+        rating = (rating + 1) * 2
+        print(f"User {user_id} updated rating for {item_id} from {rating_before} to {rating}")
+        query.update_rating("mangas", user_id, item_id, rating)
 
 
 # Load the database table into a DataFrame
-df = pd.read_sql("mangas", Connection().get())
+if user_id is None:
+    query_str = """
+    SELECT * FROM mangas
+    ORDER BY item_id
+    LIMIT 21; -- For testing only
+    """
+else:
+    query_str = f"""
+    SELECT * FROM mangas
+    LEFT JOIN mangas_ratings USING (item_id)
+    WHERE user_id = {user_id}
+    ORDER BY item_id
+    LIMIT 21; -- For testing only
+    """
+df = pd.read_sql(query_str, Connection().get())
 
 # Filter the DataFrame using the filter function
 filtered_df = filter_dataframe(df)
 
-# Display the filtered DataFrame with clickable images
-display_manga_with_images(filtered_df)
+st.html("<br>")
 
-st.sidebar.image("images/mango_logo.png", use_column_width=True)
+outer_columns = st.columns(3)
+for idx, (_, row) in enumerate(filtered_df.iterrows()):
+    col1, col2 = outer_columns[idx % 3].columns([1, 3])
+    item = f"""
+        <div class="rec_element">
+            <a href="https://myanimelist.net/anime/{row['item_id']}" rel="noopener noreferrer"
+               target="_blank">
+                <img src="{row['image']}" alt="" class="rec_image">
+                <div class="rec_text">
+                    <p></p>
+                    <p>{row['title']}</p>
+                    <p>{row['other_title']}</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    """
+    col1.html(item)
+    col2.markdown(f"**{row["title"]}**  \n{row["other_title"]}")
+    key = f"rate_{row["item_id"]}"
+
+    if row.get("rating", None) is not None:
+        st.session_state[key] = (row["rating"] // 2) - 1
+    col2.feedback(
+        "stars", key=key, on_change=update_rating, args=(row["item_id"], row["rating"], key),
+        disabled=user_id is None
+    )
+    if user_id is None:
+        col2.markdown("Log in to rate")
