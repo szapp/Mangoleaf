@@ -107,3 +107,43 @@ def add_recommendations(dataset, user_id, n):
     # Third row
     df = query.user_based(user_id, n, dataset=dataset)
     make_row("Specifically for you", df, n)
+
+
+def add_mixed_recommendations(n):
+    n = 2 * n // 2  # Make sure n is even
+    df_books = query.popularity(n // 2, "books")
+    df_mangas = query.popularity(n // 2, "mangas")
+    rows = list(df_books.iterrows()) + [(None, None)] + list(df_mangas.iterrows())
+
+    st.html(
+        """<h2 class='row_header' style='display: flex; flex-direction: row;'>
+            <div style='flex-grow: 0;'><a href="Books">Popular books</a></div>
+            <div style='flex-grow: 1;'></div>
+            <div style='flex-grow: 0;'><a href="Manga">Popular mangas</a></div>
+    </h2>"""
+    )
+
+    html_element = """<div class="rec_element">
+        <img src="{img_src}" alt="{title}" class="rec_image">
+        <div class="rec_text">
+            <p></p>
+            <p>{title}</p>
+            <p>{secondary}</p>
+        </div>
+    </div><br>"""
+
+    col_width = [1] * (n // 2) + [0.5] + [1] * (n // 2)
+    columns = st.columns(col_width)
+    for col, (_, row) in zip(columns, rows):
+        with col:
+            if row is None:
+                continue
+            st.markdown(
+                html_element.format(
+                    item_id=row.iloc[0],
+                    title=row.iloc[1],
+                    secondary=row.iloc[2],
+                    img_src=row.iloc[3],
+                ),
+                unsafe_allow_html=True,
+            )

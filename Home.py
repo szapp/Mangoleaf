@@ -19,6 +19,13 @@ st.markdown(
 **Welcome to MANGOLEAF**, your ultimate guide to discovering the best books and manga tailored
 to your tastes. Whether you're a seasoned reader or just starting, MANGOLEAF provides personalized
 recommendations to help you find your next favorite read.
+"""
+)
+
+frontend.add_mixed_recommendations(n=8)
+
+st.markdown(
+    """
 
 **About Us:**
 

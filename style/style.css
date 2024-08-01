@@ -30,9 +30,14 @@ button[type=submit]:hover {
   display: none;
 }
 
+/* Adjust link style */
+a, a:hover {
+  text-decoration: none;
+}
+
 /* Highlight text color */
 span.highlight {
-  color: rgb(248, 72, 95);
+  color: #ff6f4d;
   font-weight: bold;
 }
 
