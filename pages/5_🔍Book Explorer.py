@@ -13,11 +13,11 @@ with col1:
     st.image("images/mango_logo.png", width=130)
 
 with col2:
-    st.title("**MANGA EXPLORER**")
+    st.title("**BOOK EXPLORER**")
 
 st.markdown(
     """
-Have a look through our manga database and use filters to find what you are looking for!
+Have a look through our book database and use filters to find what you are looking for!
 """
 )
 
@@ -98,11 +98,11 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     with modification_container:
         # Define which columns can be filtered
         selectable_columns = [
-            "English name",
-            "Genres",
-            "Rank",
-            "Score",
-            "Other name",
+            "ISBN",
+            "Book-Title",
+            "Book-Author",
+            "Year-Of-Publication",
+            "Publisher",
         ]  # Example columns, adjust as needed
 
         # Ensure selectable_columns are in df
@@ -110,7 +110,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
         # Use selectable_columns for multiselect
         to_filter_columns = st.multiselect(
-            "Filter Manga on", selectable_columns, key="filter_columns_multiselect"
+            "Filter Books on", selectable_columns, key="filter_columns_multiselect"
         )
         for column in to_filter_columns:
             left, right = st.columns((1, 20))
@@ -159,12 +159,12 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def display_manga_with_images(
-    df: pd.DataFrame, image_column: str = "Image URL", anime_id_column: str = "anime_id"
+def display_books_with_images(
+    df: pd.DataFrame, image_column: str = "Image-URL-M", isbn_column: str = "ISBN"
 ):
     """
-    Display the DataFrame with images using clickable links to the anime
-    pages.
+    Display the DataFrame with images using clickable links to the
+    books.
 
     Parameters
     ----------
@@ -174,13 +174,13 @@ def display_manga_with_images(
     image_column : str
         The column in the DataFrame that contains image URLs
 
-    anime_id_column : str
-        The column in the DataFrame that contains anime IDs
+    isbn_column : str
+        The column in the DataFrame that contains ISBNs
     """
 
     # Generate HTML with clickable images for display
     def generate_clickable_image_html(row):
-        url = f"https://myanimelist.net/anime/{row[anime_id_column]}"
+        url = f"https://isbnsearch.org/isbn/{row[isbn_column]}"
         img_html = (
             f"<a href='{url}' rel='noopener noreferrer' target='_blank'>"
             f"<img src='{row[image_column]}' alt='' width='450' /></a>"
@@ -193,7 +193,14 @@ def display_manga_with_images(
     # Display the DataFrame with clickable images using HTML
     df_html = df.to_html(
         escape=False,
-        columns=["anime_id", "English name", "Genres", "Rank", "Score", "Image", "Other name"],
+        columns=[
+            "ISBN",
+            "Book-Title",
+            "Book-Author",
+            "Year-Of-Publication",
+            "Publisher",
+            "Image",
+        ],
         index=False,
     )
     df_html = df_html.replace("<table", '<table class="styled-table"')
@@ -201,13 +208,13 @@ def display_manga_with_images(
 
 
 # Load the CSV file into a DataFrame
-file_path = "data/mangas/clean/mangas.csv"
+file_path = "data/books/clean/books.csv"
 df = pd.read_csv(file_path)
 
 # Filter the DataFrame using the filter function
 filtered_df = filter_dataframe(df)
 
 # Display the filtered DataFrame with clickable images
-display_manga_with_images(filtered_df)
+display_books_with_images(filtered_df)
 
 st.sidebar.image("images/mango_logo.png", use_column_width=True)
