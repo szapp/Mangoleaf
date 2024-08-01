@@ -7,6 +7,7 @@ secrets.toml
 # Local working data
 /recommenders/
 /FirstIteration/
+*.psd
 
 # Mac OS-specific storage files
 .DS_Store

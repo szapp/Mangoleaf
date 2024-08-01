@@ -6,6 +6,12 @@
 </picture>
 
 Personal recommendations for books and mangas implemented using collaborative filtering based recommender systems
+
+---
+
+<img src="https://github.com/user-attachments/assets/b0deb0a2-7918-4bd3-aa52-b936915b2abc" width="40%">
+&nbsp;
+<img src="https://github.com/user-attachments/assets/7b9276b8-dd56-43ae-b127-d819762d3093" width="40%">
 </div>
 
 ## Contributors
