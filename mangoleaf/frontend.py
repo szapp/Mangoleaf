@@ -40,8 +40,18 @@ def add_user_input(default_user_id):
     return user_id
 
 
-def add_row_header(heading):
-    st.html(f"<h2 class='row_header'>{heading}</h2>")  # Allow coloring
+def format_title(title):
+    title = title[0] + title[1:].split("(")[0]
+    title = title[0] + title[1:].split(":")[0]
+    title = title[0] + title[1:].split("-")[0]
+    title = title.strip()
+    if len(title) > 20:
+        title = title[:20] + "…"
+    return title
+
+
+def add_row_header(heading, context=st):
+    context.html(f"<h2 class='row_header'>{heading}</h2>")  # Allow coloring
 
 
 def make_row(df, n):
@@ -88,34 +98,34 @@ def add_recommendations(dataset, user_id, n):
         make_row(df, n)
 
     # Second row (retry different items that the user has not yet rated)
-    if "second_row_title" not in st.session_state:
-        st.session_state.second_row_title = dataset
+    title = dataset
     if user_id_valid is None:
         header = "If you like"
     else:
         header = "Because you read"
-    header += f"""
-        <span class='highlight'>{st.session_state.second_row_title}</span> you might also like...
-    """
-    add_row_header(header)
+    header += " <span class='highlight'>{title}</span> you might also like..."
+    second_row_header = st.empty()
+    add_row_header(header.format(title=title), second_row_header)
     with st.spinner("Loading recommendations..."):
-        df = []
-        attempt = 0
-        while len(df) == 0 and attempt < 5:
-            ref_item = query.get_random_high_rated(user_id_valid, dataset=dataset)
-            title = ref_item.title
-            title = title[0] + title[1:].split("(")[0]
-            title = title[0] + title[1:].split(":")[0]
-            title = title[0] + title[1:].split("-")[0]
-            title = title.strip()
-            if len(title) > 20:
-                title = title[:20] + "…"
-            st.session_state.second_row_title = title
-            df = query.item_based(
-                ref_item.item_id, n, dataset=dataset, exclude_rated_by=user_id_valid
-            )
-            attempt += 1
-            make_row(df, n)
+
+        if user_id_valid is not None:
+            # Iteratate over items until a valid recommendation is found
+            df = []
+            attempt = 0
+            while len(df) == 0 and attempt < 5:
+                ref_item = query.get_random_high_rated(user_id_valid, dataset=dataset)
+                title = format_title(ref_item.title)
+                add_row_header(header.format(title=title), second_row_header)
+                df = query.item_based(ref_item.item_id, n, dataset, exclude_rated_by=user_id_valid)
+                attempt += 1
+        else:
+            # Randomly select reference item from popular items above
+            ref_item = df.sample(1).iloc[0]
+            title = format_title(ref_item.title)
+            add_row_header(header.format(title=title), second_row_header)
+            df = query.item_based(ref_item.item_id, n, dataset)
+
+        make_row(df, n)
 
     # Third row
     add_row_header("Specifically for you")
@@ -124,9 +134,8 @@ def add_recommendations(dataset, user_id, n):
     elif not user_id_valid:
         st.warning(f"Start rating {dataset} to unlock personal recommendations")
     else:
-        print(user_id)
         with st.spinner("Loading recommendations..."):
-            df = query.user_based(user_id, n, dataset=dataset)
+            df = query.user_based(user_id_valid, n, dataset)
         make_row(df, n)
 
 

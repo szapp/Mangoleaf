@@ -177,6 +177,8 @@ def user_exists(user_id, dataset):
     bool
         True if the user exists, False otherwise
     """
+    if user_id is None:
+        return False
     query = f"""
     SELECT * FROM {dataset}_ratings
     WHERE user_id = {user_id}
