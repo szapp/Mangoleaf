@@ -2,6 +2,9 @@
 
 Personal recommendations for books and mangas implemented using collaborative filtering based recommender systems
 
+## Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=szapp/Mangoleaf)](https://github.com/szapp/Mangoleaf/graphs/contributors)
 
 ## Data sources
 
