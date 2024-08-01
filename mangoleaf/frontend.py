@@ -77,7 +77,8 @@ def make_row(heading, df, n):
 
 def add_recommendations(dataset, user_id, n):
     # First row
-    df = query.popularity(n, dataset, exclude_rated_by=user_id)
+    with st.spinner("Loading recommendations..."):
+        df = query.popularity(n, dataset, exclude_rated_by=user_id)
     make_row(f"Popular {dataset}", df, n)
 
     # Check if user exists
@@ -86,12 +87,13 @@ def add_recommendations(dataset, user_id, n):
         st.stop()
 
     # Second row (retry different items that the user has not yet rated)
-    df = []
-    attempt = 0
-    while len(df) == 0 and attempt < 5:
-        ref_item = query.get_random_high_rated(user_id, dataset=dataset)
-        df = query.item_based(ref_item.item_id, n, dataset=dataset, exclude_rated_by=user_id)
-        attempt += 1
+    with st.spinner("Loading recommendations..."):
+        df = []
+        attempt = 0
+        while len(df) == 0 and attempt < 5:
+            ref_item = query.get_random_high_rated(user_id, dataset=dataset)
+            df = query.item_based(ref_item.item_id, n, dataset=dataset, exclude_rated_by=user_id)
+            attempt += 1
 
     title = ref_item.title
     title = title[0] + title[1:].split("(")[0]
@@ -105,7 +107,8 @@ def add_recommendations(dataset, user_id, n):
     )
 
     # Third row
-    df = query.user_based(user_id, n, dataset=dataset)
+    with st.spinner("Loading recommendations..."):
+        df = query.user_based(user_id, n, dataset=dataset)
     make_row("Specifically for you", df, n)
 
 

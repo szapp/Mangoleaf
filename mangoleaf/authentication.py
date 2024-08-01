@@ -11,7 +11,6 @@ def reset():
     st.session_state["authenticated"] = False
     st.session_state["username"] = None
     st.session_state["name"] = None
-    st.session_state["email"] = None
 
 
 def authenticate(username, password):
@@ -24,7 +23,6 @@ def authenticate(username, password):
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
             st.session_state["name"] = user_info["name"]
-            st.session_state["email"] = user_info["email"]
             return True
 
     return False
@@ -38,5 +36,4 @@ def get_user_info():
     return dict(
         username=st.session_state["username"],
         name=st.session_state["name"],
-        email=st.session_state["email"],
     )
