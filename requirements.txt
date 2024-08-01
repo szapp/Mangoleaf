@@ -8,8 +8,8 @@ notebook
 numpy==1.26.4
 pandas
 psycopg2-binary
-sqlalchemy
 scikit-surprise
+sqlalchemy
 streamlit
 tqdm
 -e .

@@ -1,3 +1,7 @@
+"""
+Books explorer page
+"""
+
 import pandas as pd
 import streamlit as st
 from pandas.api.types import (
@@ -6,6 +10,8 @@ from pandas.api.types import (
     is_numeric_dtype,
     is_object_dtype,
 )
+
+from mangoleaf import Connection
 
 col1, col2 = st.columns([1, 7])
 
@@ -98,11 +104,11 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     with modification_container:
         # Define which columns can be filtered
         selectable_columns = [
-            "ISBN",
-            "Book-Title",
-            "Book-Author",
-            "Year-Of-Publication",
-            "Publisher",
+            "item_id",
+            "title",
+            "author",
+            # "Year-Of-Publication",
+            # "Publisher",
         ]  # Example columns, adjust as needed
 
         # Ensure selectable_columns are in df
@@ -160,7 +166,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def display_books_with_images(
-    df: pd.DataFrame, image_column: str = "Image-URL-M", isbn_column: str = "ISBN"
+    df: pd.DataFrame, image_column: str = "image", id_column: str = "item_id"
 ):
     """
     Display the DataFrame with images using clickable links to the
@@ -174,13 +180,13 @@ def display_books_with_images(
     image_column : str
         The column in the DataFrame that contains image URLs
 
-    isbn_column : str
-        The column in the DataFrame that contains ISBNs
+    id_column : str
+        The column in the DataFrame that contains the unique IDs
     """
 
     # Generate HTML with clickable images for display
     def generate_clickable_image_html(row):
-        url = f"https://isbnsearch.org/isbn/{row[isbn_column]}"
+        url = f"https://isbnsearch.org/isbn/{row[id_column]}"
         img_html = (
             f"<a href='{url}' rel='noopener noreferrer' target='_blank'>"
             f"<img src='{row[image_column]}' alt='' width='450' /></a>"
@@ -188,18 +194,18 @@ def display_books_with_images(
         return img_html
 
     # Add a new column for clickable images
-    df["Image"] = df.apply(generate_clickable_image_html, axis=1)
+    df["image"] = df.apply(generate_clickable_image_html, axis=1)
 
     # Display the DataFrame with clickable images using HTML
     df_html = df.to_html(
         escape=False,
         columns=[
-            "ISBN",
-            "Book-Title",
-            "Book-Author",
-            "Year-Of-Publication",
-            "Publisher",
-            "Image",
+            "item_id",
+            "title",
+            "author",
+            # "Year-Of-Publication",
+            # "Publisher",
+            "image",
         ],
         index=False,
     )
@@ -207,9 +213,8 @@ def display_books_with_images(
     st.markdown(df_html, unsafe_allow_html=True)
 
 
-# Load the CSV file into a DataFrame
-file_path = "data/books/clean/books.csv"
-df = pd.read_csv(file_path)
+# Load the database table into a DataFrame
+df = pd.read_sql("books", Connection().get())
 
 # Filter the DataFrame using the filter function
 filtered_df = filter_dataframe(df)

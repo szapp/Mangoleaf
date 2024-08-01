@@ -1,3 +1,7 @@
+"""
+Manga explorer page
+"""
+
 import pandas as pd
 import streamlit as st
 from pandas.api.types import (
@@ -6,6 +10,8 @@ from pandas.api.types import (
     is_numeric_dtype,
     is_object_dtype,
 )
+
+from mangoleaf import Connection
 
 col1, col2 = st.columns([1, 7])
 
@@ -98,11 +104,11 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     with modification_container:
         # Define which columns can be filtered
         selectable_columns = [
-            "English name",
-            "Genres",
-            "Rank",
-            "Score",
-            "Other name",
+            "title",
+            # "Genres",
+            # "Rank",
+            # "Score",
+            "other_title",
         ]  # Example columns, adjust as needed
 
         # Ensure selectable_columns are in df
@@ -160,7 +166,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def display_manga_with_images(
-    df: pd.DataFrame, image_column: str = "Image URL", anime_id_column: str = "anime_id"
+    df: pd.DataFrame, image_column: str = "image", id_column: str = "item_id"
 ):
     """
     Display the DataFrame with images using clickable links to the anime
@@ -174,13 +180,13 @@ def display_manga_with_images(
     image_column : str
         The column in the DataFrame that contains image URLs
 
-    anime_id_column : str
-        The column in the DataFrame that contains anime IDs
+    id_column : str
+        The column in the DataFrame that contains the unique IDs
     """
 
     # Generate HTML with clickable images for display
     def generate_clickable_image_html(row):
-        url = f"https://myanimelist.net/anime/{row[anime_id_column]}"
+        url = f"https://myanimelist.net/anime/{row[id_column]}"
         img_html = (
             f"<a href='{url}' rel='noopener noreferrer' target='_blank'>"
             f"<img src='{row[image_column]}' alt='' width='450' /></a>"
@@ -188,21 +194,28 @@ def display_manga_with_images(
         return img_html
 
     # Add a new column for clickable images
-    df["Image"] = df.apply(generate_clickable_image_html, axis=1)
+    df["image"] = df.apply(generate_clickable_image_html, axis=1)
 
     # Display the DataFrame with clickable images using HTML
     df_html = df.to_html(
         escape=False,
-        columns=["anime_id", "English name", "Genres", "Rank", "Score", "Image", "Other name"],
+        columns=[
+            "item_id",
+            "title",
+            "other_title",
+            # "Genres",
+            # "Rank",
+            # "Score",
+            "image",
+        ],
         index=False,
     )
     df_html = df_html.replace("<table", '<table class="styled-table"')
     st.markdown(df_html, unsafe_allow_html=True)
 
 
-# Load the CSV file into a DataFrame
-file_path = "data/mangas/clean/mangas.csv"
-df = pd.read_csv(file_path)
+# Load the database table into a DataFrame
+df = pd.read_sql("mangas", Connection().get())
 
 # Filter the DataFrame using the filter function
 filtered_df = filter_dataframe(df)
