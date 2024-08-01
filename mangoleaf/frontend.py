@@ -8,7 +8,7 @@ import streamlit as st
 
 from mangoleaf import authentication, query
 
-tv_keywords = re.compile(r"\s*season \d*\s*", re.IGNORECASE)
+tv_keywords = re.compile(r"(\s*season\s*\d*\s*|\s*\d*[st|rd|th|\.]*season\s*)", re.IGNORECASE)
 
 
 def add_config():
@@ -46,6 +46,7 @@ def add_user_input(default_user_id):
 
 def format_title(title):
     title = tv_keywords.sub("", title)
+    title = title.strip(",. ")
     title = title[0] + title[1:].split("(")[0]
     title = title[0] + title[1:].split(":")[0]
     title = title[0] + title[1:].split("-")[0]
