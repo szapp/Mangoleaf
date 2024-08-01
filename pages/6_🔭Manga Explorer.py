@@ -93,7 +93,7 @@ user_id = authentication.get_user_info()["user_id"]
 
 
 def update_rating(item_id, rating_before, key):
-    rating = st.session_state.get(key, None)
+    rating = st.session_state.get(key)
     if rating is not None:
         rating = (rating + 1) * 2
         print(f"User {user_id} updated rating for {item_id} from {rating_before} to {rating}")
@@ -143,10 +143,10 @@ for idx, (_, row) in enumerate(filtered_df.iterrows()):
     col2.markdown(f"**{row["title"]}**  \n{row["other_title"]}")
     key = f"rate_{row["item_id"]}"
 
-    if row.get("rating", None) is not None:
+    if row.get("rating") is not None:
         st.session_state[key] = (row["rating"] // 2) - 1
     col2.feedback(
-        "stars", key=key, on_change=update_rating, args=(row["item_id"], row["rating"], key),
+        "stars", key=key, on_change=update_rating, args=(row["item_id"], row.get("rating"), key),
         disabled=user_id is None
     )
     if user_id is None:
