@@ -6,7 +6,9 @@ precomputed recommendations from the SQL database. The recommendations
 are then displayed in the streamlit app.
 """
 
+import bcrypt
 import pandas as pd
+from sqlalchemy.sql import text
 
 from mangoleaf import Connection
 
@@ -180,3 +182,35 @@ def user_exists(user_id, dataset):
     """
     df = pd.read_sql(query, Connection().get())
     return len(df) > 0
+
+
+def match_user_credentials(username, password):
+    """
+    Check if username and password match credentials in database
+
+    Parameters
+    ----------
+    username : str
+        Username to check
+
+    password : str
+        Password to check
+
+    Returns
+    -------
+    user_info : dict or None
+        User information if the credentials match, None otherwise
+    """
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = text("SELECT * FROM users WHERE username = :username")
+        result = connection.execute(query, dict(username=username)).fetchone()
+
+        if result is None:
+            return None
+
+        if not bcrypt.checkpw(password.encode("utf-8"), result.password.encode("utf-8")):
+            return None
+
+        user_info = dict(result._mapping)
+    return user_info

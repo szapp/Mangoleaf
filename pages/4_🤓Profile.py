@@ -20,7 +20,8 @@ user_data = authentication.get_user_info()
 
 # Display user profile information
 st.title("User Profile", anchor=False)
-st.markdown(f"**Name:** {user_data['name']}")
+st.markdown(f"**Username:** {user_data['username']}")
+st.markdown(f"**Name:** {user_data['full_name']}")
 
 # Add additional profile information as needed
 st.subheader("Additional Information", anchor=False)

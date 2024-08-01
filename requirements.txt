@@ -1,3 +1,4 @@
+bcrypt
 black
 flake8
 ipython

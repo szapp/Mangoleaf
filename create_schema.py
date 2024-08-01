@@ -7,6 +7,7 @@ The schema is described in the file schema.sql. The data is loaded
 from the cleaned CSV files in the data folder.
 """
 
+import bcrypt
 import pandas as pd
 from sqlalchemy.sql import text
 
@@ -22,6 +23,7 @@ def main():
     with open("schema.sql") as f:
         sql_commands = f.read()
 
+    print("Create schema")
     with db_engine.connect() as connection:
         for command in sql_commands.split(";"):
             if command.strip():
@@ -29,12 +31,14 @@ def main():
         connection.commit()
 
     # Load cleaned data locally
+    print("Load data from disk")
     books = pd.read_csv("data/books/clean/books.csv", dtype="object")
     mangas = pd.read_csv("data/mangas/clean/mangas.csv", dtype="object")
     books_ratings = pd.read_csv("data/books/clean/ratings.csv", dtype="object")
     mangas_ratings = pd.read_csv("data/mangas/clean/ratings.csv", dtype="object")
 
     # Fill the static data: Books
+    print("Fill static data")
     df = books[["ISBN", "Book-Title", "Book-Author", "Image-URL-M"]]
     df = df.rename(
         columns={
@@ -59,15 +63,20 @@ def main():
     df.to_sql("mangas", db_engine, if_exists="append", index=False)
 
     # Create users
-    user_id = set(books_ratings["User-ID"].unique())
-    user_id |= set(mangas_ratings["user_id"].unique())
+    print("Create static users from ratings")
+    user_id = set(books_ratings["User-ID"].unique()) | set(mangas_ratings["user_id"].unique())
     user_id = list(user_id)
-    usernames = [f"User {i}" for i in user_id]
-    passwords = [f"password{i}" for i in user_id]
-    df = pd.DataFrame(dict(user_id=user_id, username=usernames, password=passwords))
+    usernames = [f"user_{i}" for i in user_id]
+    full_names = [f"User {i}" for i in user_id]
+    dummy_password = bcrypt.hashpw(b"booksandmanga", bcrypt.gensalt()).decode("utf-8")
+    passwords = [dummy_password] * len(user_id)
+    df = pd.DataFrame(
+        dict(user_id=user_id, username=usernames, password=passwords, full_name=full_names)
+    )
     df.to_sql("users", db_engine, if_exists="append", index=False)
 
     # Fill the ratings: Books
+    print("Add ratings")
     df = books_ratings.rename(
         columns={"User-ID": "user_id", "ISBN": "item_id", "Book-Rating": "rating"}
     )
@@ -79,6 +88,7 @@ def main():
 
     # Close the connection
     db_engine.dispose()
+    print("Done")
 
 
 if __name__ == "__main__":

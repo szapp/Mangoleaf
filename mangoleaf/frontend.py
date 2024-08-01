@@ -154,7 +154,8 @@ def add_mixed_recommendations(n):
 
 def add_sidebar_login():
     if authentication.is_authenticated():
-        st.sidebar.success(f"Logged in as {st.session_state['name']}")
+        user = authentication.get_user_info()
+        st.sidebar.success(f"Logged in as {user['username']}")
         if st.sidebar.button("Logout", key="sidebar_logout"):
             authentication.reset()
             st.sidebar.info("You have logged out")
@@ -175,7 +176,7 @@ def add_sidebar_login():
         if submit:
             if authentication.authenticate(username, password):
                 user = authentication.get_user_info()
-                st.sidebar.success(f"Welcome {user['name']}")
+                st.sidebar.success(f"Welcome {user['username']}")
                 st.rerun()
             else:
                 st.sidebar.error("Username/password is incorrect")

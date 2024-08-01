@@ -3,29 +3,27 @@ Authenticate user access
 """
 
 import streamlit as st
-import yaml
-from yaml.loader import SafeLoader
+
+from mangoleaf import query
 
 
 def reset():
     st.session_state["authenticated"] = False
     st.session_state["username"] = None
-    st.session_state["name"] = None
+    st.session_state["full_name"] = None
+    st.session_state["user_id"] = None
 
 
 def authenticate(username, password):
-    with open("data/config.yaml", encoding="utf-8") as file:
-        config = yaml.load(file, Loader=SafeLoader)
+    user_info = query.match_user_credentials(username, password)
+    if user_info is None:
+        return False
 
-    if username in config["credentials"]["usernames"]:
-        user_info = config["credentials"]["usernames"][username]
-        if user_info["password"] == password:
-            st.session_state["authenticated"] = True
-            st.session_state["username"] = username
-            st.session_state["name"] = user_info["name"]
-            return True
-
-    return False
+    st.session_state["authenticated"] = True
+    st.session_state["username"] = user_info["username"]
+    st.session_state["full_name"] = user_info["full_name"]
+    st.session_state["user_id"] = user_info["user_id"]
+    return True
 
 
 def is_authenticated():
@@ -35,5 +33,6 @@ def is_authenticated():
 def get_user_info():
     return dict(
         username=st.session_state["username"],
-        name=st.session_state["name"],
+        full_name=st.session_state["full_name"],
+        user_id=st.session_state["user_id"],
     )
