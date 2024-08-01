@@ -147,10 +147,11 @@ def get_random_high_rated(user_id, dataset):
     pd.Series
         Item information of the random high rated book or manga
     """
+    query_user = f"WHERE user_id = {user_id}" if user_id is not None else ""
     query = f"""
     SELECT * FROM {dataset}_ratings
     INNER JOIN {dataset} USING (item_id)
-    WHERE user_id = {user_id}
+    {query_user}
     ORDER BY rating DESC, RANDOM()
     LIMIT 10;
     """

@@ -32,7 +32,7 @@ def is_authenticated():
 
 def get_user_info():
     return dict(
-        username=st.session_state["username"],
-        full_name=st.session_state["full_name"],
-        user_id=st.session_state["user_id"],
+        username=st.session_state.get("username", None),
+        full_name=st.session_state.get("full_name", None),
+        user_id=st.session_state.get("user_id", None),
     )

@@ -40,13 +40,15 @@ def add_user_input(default_user_id):
     return user_id
 
 
-def make_row(heading, df, n):
+def add_row_header(heading):
+    st.html(f"<h2 class='row_header'>{heading}</h2>")  # Allow coloring
+
+
+def make_row(df, n):
     if "author" in df.columns:
         url = "https://isbnsearch.org/isbn/"
     else:
         url = "https://myanimelist.net/anime/"
-
-    st.html(f"<h2 class='row_header'>{heading}</h2>")  # Allow coloring
 
     html_element = """<div class="rec_element">
         <a href="{url}{item_id}"
@@ -76,40 +78,56 @@ def make_row(heading, df, n):
 
 
 def add_recommendations(dataset, user_id, n):
-    # First row
-    with st.spinner("Loading recommendations..."):
-        df = query.popularity(n, dataset, exclude_rated_by=user_id)
-    make_row(f"Popular {dataset}", df, n)
+    # Check if user_id has rated items in that dataset
+    user_id_valid = user_id if query.user_exists(user_id, dataset) else None
 
-    # Check if user exists
-    if not query.user_exists(user_id, dataset):
-        st.error("Invalid User ID", icon="🚨")
-        st.stop()
+    # First row
+    add_row_header(f"Popular {dataset}")
+    with st.spinner("Loading recommendations..."):
+        df = query.popularity(n, dataset, exclude_rated_by=user_id_valid)
+        make_row(df, n)
 
     # Second row (retry different items that the user has not yet rated)
+    if "second_row_title" not in st.session_state:
+        st.session_state.second_row_title = dataset
+    if user_id_valid is None:
+        header = "If you like"
+    else:
+        header = "Because you read"
+    header += f"""
+        <span class='highlight'>{st.session_state.second_row_title}</span> you might also like...
+    """
+    add_row_header(header)
     with st.spinner("Loading recommendations..."):
         df = []
         attempt = 0
         while len(df) == 0 and attempt < 5:
-            ref_item = query.get_random_high_rated(user_id, dataset=dataset)
-            df = query.item_based(ref_item.item_id, n, dataset=dataset, exclude_rated_by=user_id)
+            ref_item = query.get_random_high_rated(user_id_valid, dataset=dataset)
+            title = ref_item.title
+            title = title[0] + title[1:].split("(")[0]
+            title = title[0] + title[1:].split(":")[0]
+            title = title[0] + title[1:].split("-")[0]
+            title = title.strip()
+            if len(title) > 20:
+                title = title[:20] + "…"
+            st.session_state.second_row_title = title
+            df = query.item_based(
+                ref_item.item_id, n, dataset=dataset, exclude_rated_by=user_id_valid
+            )
             attempt += 1
-
-    title = ref_item.title
-    title = title[0] + title[1:].split("(")[0]
-    title = title[0] + title[1:].split(":")[0]
-    title = title[0] + title[1:].split("-")[0]
-    title = title.strip()
-    if len(title) > 20:
-        title = title[:20] + "…"
-    make_row(
-        f"Because you read <span class='highlight'>{title}</span> you might also like...", df, n
-    )
+            make_row(df, n)
 
     # Third row
-    with st.spinner("Loading recommendations..."):
-        df = query.user_based(user_id, n, dataset=dataset)
-    make_row("Specifically for you", df, n)
+    add_row_header("Specifically for you")
+    if user_id is None:
+        st.warning("Please log in to unlock personal recommendations")
+    elif not user_id_valid:
+        st.warning(f"Start rating {dataset} to unlock personal recommendations")
+    else:
+        print(user_id)
+        with st.spinner("Loading recommendations..."):
+            df = query.user_based(user_id, n, dataset=dataset)
+        make_row(df, n)
 
 
 def add_mixed_recommendations(n):
@@ -155,14 +173,11 @@ def add_mixed_recommendations(n):
 def add_sidebar_login():
     if authentication.is_authenticated():
         user = authentication.get_user_info()
-        st.sidebar.success(f"Logged in as {user['username']}")
+        st.sidebar.markdown(f"Logged in as {user['username']}")
         if st.sidebar.button("Logout", key="sidebar_logout"):
             authentication.reset()
             st.sidebar.info("You have logged out")
             st.rerun()
-        else:
-            st.sidebar.success("Choose between books and mangas")
-            st.sidebar.markdown("**Now you have access to other pages.**")
     else:
         st.sidebar.title("Login")
 
