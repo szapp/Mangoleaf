@@ -30,6 +30,12 @@ button[type=submit]:hover {
   display: none;
 }
 
+/* Reduce vertical padding of content*/
+[data-testid="stAppViewBlockContainer"] {
+  padding-top: 3rem;
+  padding-bottom: 6rem;
+}
+
 /* Adjust link style */
 a, a:hover {
   text-decoration: none;

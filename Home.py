@@ -24,16 +24,18 @@ recommendations to help you find your next favorite read.
 
 frontend.add_mixed_recommendations(n=8)
 
+
+st.subheader("About Us", anchor=False)
 st.markdown(
     """
-
-**About Us:**
-
 Mangoleaf is brought to you by Max and Sören, passionate developers and data scientists dedicated
 to enhancing your reading experience.
+"""
+)
 
-How To Use MANGOLEAF:
-
+st.subheader("How To Use MANGOLEAF", anchor=False)
+st.markdown(
+    """
 Choose on the left if you are interested in Books or Manga and explore the recommendations!
 """
 )
