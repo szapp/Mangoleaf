@@ -9,7 +9,13 @@ import streamlit as st
 
 from mangoleaf import authentication, query
 
-tv_keywords = re.compile(r"(\s*season\s*\d*\s*|\s*\d*[st|rd|th|\.]*season\s*)", re.IGNORECASE)
+tv_keywords = re.compile(
+    r"(\s*(00)?\:?\s*(the)?\s*(final|second|first|third)?\s*season"
+    r"\s*(two)?\d*\s*(part)?\s*\d*\s*(part)?\s*\d*\s*\:?|"
+    r"\s*(\d+(st|nd|rd|th|\.))?\s*season|"
+    r"\s*part\s*\d*\s*)",
+    re.IGNORECASE,
+)
 
 
 def add_config():
@@ -270,7 +276,7 @@ def filter_builder(filter_options, display_names=None):
                 user_text_input = st.text_input(f"Search {disp_name}", key=f"{column}_text_input")
                 if user_text_input:
                     query_params[column] = f"%{user_text_input}%"
-                    clauses.append(column + f" LIKE %({column})s")
+                    clauses.append(column + f" ILIKE %({column})s")
             elif isinstance(filter_type, str) and filter_type == "rating":
                 # Rating slider
                 col1, col2 = st.columns(2, gap="large", vertical_alignment="center")
@@ -341,7 +347,7 @@ def filter_builder(filter_options, display_names=None):
                 )
                 for i, cat in enumerate(user_cat_input):
                     query_params[f"{column}_{i}"] = f"%{cat}%"
-                    clauses.append(column + f" LIKE %({column}_{i})s")
+                    clauses.append(column + f" ILIKE %({column}_{i})s")
 
     where_query = " AND ".join(clauses)
     if where_query:
@@ -460,10 +466,11 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
                 img_src=row["image"],
             )
         )
+        title = tv_keywords.sub("", row["title"])
         categories = " &bull; ".join(str(row.iloc[3]).split("|"))
         col2.html(
             f"""
-                <b>{row['title']}</b><br />
+                <b>{title}</b><br />
                 <span class="secondary">{row.iloc[2]}</span><br />
                 <span class="secondary">{categories}</span>
             """
