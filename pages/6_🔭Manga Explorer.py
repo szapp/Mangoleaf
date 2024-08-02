@@ -103,6 +103,8 @@ def filter_builder(filter_options, display_names=None):
                 clauses.append(column + f" IN %({column})s")
 
     where_query = " AND ".join(clauses)
+    if where_query:
+        where_query = "WHERE " + where_query
     return where_query, query_params
 
 
@@ -135,8 +137,8 @@ max_items = 21
 if user_id is None:
     query_str = f"""
     SELECT * FROM mangas
-    WHERE {where_query}
-    ORDER BY item_id
+    {where_query}
+    ORDER BY title
     LIMIT {max_items};
     """
 else:
@@ -146,11 +148,11 @@ else:
         SELECT * FROM mangas_ratings
         WHERE user_id = {user_id}
     ) r USING (item_id)
-    WHERE {where_query}
-    ORDER BY item_id
+    {where_query}
+    ORDER BY title
     LIMIT {max_items};
     """
-print(query_str, query_params)
+
 df = pd.read_sql(query_str, Connection().get(), params=query_params)
 
 # Fill the ratings
