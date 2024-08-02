@@ -343,6 +343,7 @@ def filter_builder(filter_options, display_names=None):
                     f"Categories of {disp_name}",
                     filter_type,
                     default=[],
+                    placeholder="Choose to filter",
                     key=f"{column}_cat_multiselect",
                 )
                 for i, cat in enumerate(user_cat_input):

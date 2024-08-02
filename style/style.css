@@ -1,27 +1,56 @@
 /* Style inputs with type="text", select elements and textareas */
-input[type=text], input[type=email], textarea {
-  width: 100%; /* Full width */
-  padding: 12px; /* Some padding */  
-  border-radius: 4px; /* Rounded borders */
-  box-sizing: border-box; /* Make sure that padding and width stays in place */
-  margin-top: 6px; /* Add a top margin */
-  margin-bottom: 16px; /* Bottom margin */
-  resize: vertical /* Allow the user to vertically resize the textarea (not horizontally) */
+input[type=text],
+input[type=email],
+textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border-width: 1px;
+  border-color: transparent;
+  box-sizing: border-box;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  resize: vertical;
+  box-shadow: none;
+}
+input[type=text]:focus:not(:active),
+input[type=email]:focus:not(:active),
+textarea:focus:not(:active) {
+  border-color: rgb(255, 111, 77);
+}
+input[type=text]:focus,
+input[type=email]:focus,
+textarea:focus {
+  outline: none;
+}
+input[type=text]:focus-visible,
+input[type=email]:focus-visible,
+textarea:focus-visible {
+  border-color: #ff6f4d;
+  box-shadow: none;
 }
 
 /* Style the submit button with a specific background color etc */
 button[type=submit] {
-  background-color: #04AA6D;
+  background-color: #e4816a;
   color: white;
   padding: 12px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
 }
-
-/* When moving the mouse over the submit button, add a darker green color */
 button[type=submit]:hover {
-  background-color: #45a049;
+  background-color: #ff6f4d;
+}
+button[type=submit]:focus:not(:active) {
+  border-color: rgb(255, 111, 77);
+}
+button[type=submit]:focus {
+  outline: none;
+}
+button[type=submit]:focus-visible {
+  background-color: #ff6f4d;
+  box-shadow: rgba(255, 111, 77, 0.5) 0px 0px 0px 0.2rem;
 }
 
 /* Remove full screen buttons for images */
