@@ -129,33 +129,15 @@ div.rec_element:hover div.rec_text {
 }
 
 /* Explorer table */
-.styled-table {
-  border-collapse: collapse;
-  margin: 25px 0;
-  font-size: 0.9em;
-  font-family: sans-serif;
-  min-width: 400px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-  border-radius: 10px 10px 0 0;
-  overflow: hidden;
+div.explorer_info {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
-.styled-table thead tr {
-  background-color: #333333;
-  color: #ffffff;
-  text-align: left;
-}
-.styled-table th,
-.styled-table td {
-  padding: 12px 15px;
-}
-.styled-table tbody tr {
-  border-bottom: 1px solid #dddddd;
-}
-.styled-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
-}
-.styled-table img {
-  width: 200px; /* Adjust this value to change image size */
-  height: auto;
-  border-radius: 5px;
+div.explorer_info > div {
+  background-color: #202020;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  padding: 4px 12px;
 }
