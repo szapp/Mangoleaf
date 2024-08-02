@@ -15,8 +15,29 @@ frontend.add_header_logo("Manga Explorer")
 filter_options = dict(
     title="text",
     other_title="text",
+    genres=[
+        "comedy",
+        "gourmet",
+        "adventure",
+        "award winning",
+        "drama",
+        "mystery",
+        "sci-fi",
+        "fantasy",
+        "slice of life",
+        "supernatural",
+        "romance",
+        "horror",
+        "suspense",
+        "action",
+        "ecchi",
+        "boys love",
+        "sports",
+        "avant garde",
+        "girls love",
+    ],
 )
-display_names = ["English title", "Original title", "Your rating"]
+display_names = ["english title", "original title", "genres", "your rating"]
 
 # Add rating if logged in
 user_id = authentication.get_user_info()["user_id"]

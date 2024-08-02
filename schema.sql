@@ -18,7 +18,10 @@ CREATE TABLE users (
   user_id INTEGER PRIMARY KEY,
   username VARCHAR(50) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  full_name VARCHAR(255) NOT NULL
+  full_name VARCHAR(255) NOT NULL,
+  about TEXT,
+  image VARCHAR(255),
+  registered TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Book and manga tables (static)
@@ -27,6 +30,7 @@ CREATE TABLE books (
   item_id VARCHAR(20) PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   author VARCHAR(255),
+  year INTEGER,
   image VARCHAR(255)
 );
 
@@ -34,6 +38,7 @@ CREATE TABLE mangas (
   item_id INTEGER PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   other_title VARCHAR(255),
+  genres VARCHAR(255),
   image VARCHAR(255)
 );
 

@@ -108,10 +108,10 @@ def make_row(df, n, context=st):
             st.markdown(
                 html_element.format(
                     url=url,
-                    item_id=row.iloc[0],
-                    title=row.iloc[1],
+                    item_id=row["item_id"],
+                    title=row["title"],
                     secondary=row.iloc[2],
-                    img_src=row.iloc[3],
+                    img_src=row["image"],
                 ),
                 unsafe_allow_html=True,
             )
@@ -222,10 +222,10 @@ def add_mixed_recommendations(n):
             with col:
                 st.markdown(
                     html_element.format(
-                        item_id=row.iloc[0],
-                        title=row.iloc[1],
+                        item_id=row["item_id"],
+                        title=row["title"],
                         secondary=row.iloc[2],
-                        img_src=row.iloc[3],
+                        img_src=row["image"],
                     ),
                     unsafe_allow_html=True,
                 )
@@ -272,7 +272,7 @@ def filter_builder(filter_options, display_names=None):
                     query_params[column] = f"%{user_text_input}%"
                     clauses.append(column + f" LIKE %({column})s")
             elif isinstance(filter_type, str) and filter_type == "rating":
-                # Numeric range slider
+                # Rating slider
                 col1, col2 = st.columns(2, gap="large", vertical_alignment="center")
                 user_num_input = col1.slider(
                     "Range of your rating",
@@ -296,17 +296,63 @@ def filter_builder(filter_options, display_names=None):
                     )
                 else:
                     clauses.append(column + f" BETWEEN %({column}_min)s AND %({column}_max)s")
+            elif (
+                isinstance(filter_type, (tuple, list))
+                and all(isinstance(i, (int, float)) for i in filter_type)
+                and len(filter_type) == 2
+            ):
+                # Numeric range slider
+                is_int = all(
+                    isinstance(i, (int, float)) and (isinstance(i, int) or i.is_integer())
+                    for i in filter_type
+                )
+                if is_int:
+                    _min = int(filter_type[0])
+                    _max = int(filter_type[1])
+                    step = 1
+                else:
+                    _min = float(filter_type[0])
+                    _max = float(filter_type[1])
+                    step = (_max - _min) / 100
+                col1, col2 = st.columns(2, gap="large", vertical_alignment="center")
+                user_num_input = col1.slider(
+                    f"Range of {disp_name}",
+                    min_value=_min,
+                    max_value=_max,
+                    value=(_min, _max),
+                    step=step,
+                    key=f"{column}_num_slider",
+                )
+                user_bool_input = col2.checkbox(
+                    "Include missing values",
+                    value=True,
+                    key=f"{column}_bool_checkbox",
+                )
+                if is_int:
+                    query_params[f"{column}_min"] = int(user_num_input[0])
+                    query_params[f"{column}_max"] = int(user_num_input[1])
+                else:
+                    query_params[f"{column}_min"] = float(user_num_input[0])
+                    query_params[f"{column}_max"] = float(user_num_input[1])
+                if user_bool_input:
+                    clauses.append(
+                        "(" + column + f" BETWEEN %({column}_min)s AND %({column}_max)s"
+                        " OR " + column + " IS NULL)"
+                    )
+                else:
+                    clauses.append(column + f" BETWEEN %({column}_min)s AND %({column}_max)s")
             else:
                 # Categorical values
                 filter_type = list(map(str, filter_type))
                 user_cat_input = st.multiselect(
                     f"Categories of {disp_name}",
                     filter_type,
-                    default=filter_type,
+                    default=[],
                     key=f"{column}_cat_multiselect",
                 )
-                query_params[column] = tuple(user_cat_input)
-                clauses.append(column + f" IN %({column})s")
+                for i, cat in enumerate(user_cat_input):
+                    query_params[f"{column}_{i}"] = f"%{cat}%"
+                    clauses.append(column + f" LIKE %({column}_{i})s")
 
     where_query = " AND ".join(clauses)
     if where_query:
@@ -425,7 +471,8 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
                 img_src=row["image"],
             )
         )
-        col2.markdown(f"**{row['title']}**  \n{row.iloc[2]}")
+        categories = " &bull; ".join(str(row.iloc[3]).split("|"))
+        col2.markdown(f"**{row['title']}**  \n{row.iloc[2]}  \n{categories}")
         key = f"rate_{row['item_id']}"
         col2.feedback(
             "stars",

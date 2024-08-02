@@ -39,27 +39,30 @@ def main():
 
     # Fill the static data: Books
     print("Fill static data")
-    df = books[["ISBN", "Book-Title", "Book-Author", "Image-URL-M"]]
+    df = books[["ISBN", "Book-Title", "Book-Author", "Year-Of-Publication", "Image-URL-M"]]
     df = df.rename(
         columns={
             "ISBN": "item_id",
             "Book-Title": "title",
             "Book-Author": "author",
+            "Year-Of-Publication": "year",
             "Image-URL-M": "image",
         }
     )
     df.to_sql("books", db_engine, if_exists="append", index=False)
 
     # Fill the static data: Mangas
-    df = mangas[["anime_id", "English name", "Other name", "Image URL"]]
+    df = mangas[["anime_id", "English name", "Other name", "Genres", "Image URL"]]
     df = df.rename(
         columns={
             "anime_id": "item_id",
             "English name": "title",
             "Other name": "other_title",
+            "Genres": "genres",
             "Image URL": "image",
         }
     )
+    df["genres"] = df["genres"].str.lower().str.split(", ").apply(lambda x: "|".join(x))
     df.to_sql("mangas", db_engine, if_exists="append", index=False)
 
     # Create users

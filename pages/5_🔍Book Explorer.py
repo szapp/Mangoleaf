@@ -12,11 +12,8 @@ frontend.add_sidebar_logo()
 frontend.add_header_logo("Book Explorer")
 
 # Filter the DataFrame using the filter function
-filter_options = dict(
-    title="text",
-    author="text",
-)
-display_names = ["Title", "Author", "Your rating"]
+filter_options = dict(title="text", author="text", year=[1930, 2004])
+display_names = ["title", "author", "year", "your rating"]
 
 # Add rating if logged in
 user_id = authentication.get_user_info()["user_id"]
