@@ -18,13 +18,7 @@ frontend.add_style()
 frontend.add_sidebar_login()
 frontend.add_sidebar_logo()
 
-col1, col2 = st.columns([1, 7])
-
-with col1:
-    st.image("images/mango_logo.png", width=130)
-
-with col2:
-    st.title("**BOOK EXPLORER**", anchor=False)
+frontend.add_header_logo("Book Explorer")
 
 st.markdown(
     """

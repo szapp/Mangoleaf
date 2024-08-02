@@ -11,14 +11,7 @@ frontend.add_style()
 frontend.add_sidebar_login()
 frontend.add_sidebar_logo()
 
-col1, col2 = st.columns([1, 7])
-
-with col1:
-    st.image("images/mango_logo.png", width=130)
-
-# Display user profile information
-with col2:
-    st.title("**USER PROFILE**", anchor=False)
+frontend.add_header_logo("User Profile")
 
 # Check if the user is authenticated
 if not authentication.is_authenticated():

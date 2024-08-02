@@ -24,6 +24,12 @@ def add_style():
         st.html(f"<style>{f.read()}</style>")
 
 
+def add_header_logo(header):
+    col1, col2 = st.columns([1, 7])
+    col1.image("images/mango_logo.png", width=130)
+    col2.title(f"**{header.upper()}**", anchor=False)
+
+
 def add_sidebar_logo():
     st.sidebar.image("images/mango_logo.png", use_column_width=True)
 
