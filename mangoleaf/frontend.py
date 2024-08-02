@@ -323,24 +323,13 @@ def filter_builder(filter_options, display_names=None):
                     step=step,
                     key=f"{column}_num_slider",
                 )
-                user_bool_input = col2.checkbox(
-                    "Include missing values",
-                    value=True,
-                    key=f"{column}_bool_checkbox",
-                )
                 if is_int:
                     query_params[f"{column}_min"] = int(user_num_input[0])
                     query_params[f"{column}_max"] = int(user_num_input[1])
                 else:
                     query_params[f"{column}_min"] = float(user_num_input[0])
                     query_params[f"{column}_max"] = float(user_num_input[1])
-                if user_bool_input:
-                    clauses.append(
-                        "(" + column + f" BETWEEN %({column}_min)s AND %({column}_max)s"
-                        " OR " + column + " IS NULL)"
-                    )
-                else:
-                    clauses.append(column + f" BETWEEN %({column}_min)s AND %({column}_max)s")
+                clauses.append(column + f" BETWEEN %({column}_min)s AND %({column}_max)s")
             else:
                 # Categorical values
                 filter_type = list(map(str, filter_type))
@@ -472,17 +461,24 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
             )
         )
         categories = " &bull; ".join(str(row.iloc[3]).split("|"))
-        col2.markdown(f"**{row['title']}**  \n{row.iloc[2]}  \n{categories}")
-        key = f"rate_{row['item_id']}"
-        col2.feedback(
-            "stars",
-            key=key,
-            on_change=update_rating,
-            args=(dataset, user_id, row["item_id"], row.get("rating", pd.NA), key),
-            disabled=user_id is None,
+        col2.html(
+            f"""
+                <b>{row['title']}</b><br />
+                <span class="secondary">{row.iloc[2]}</span><br />
+                <span class="secondary">{categories}</span>
+            """
         )
-        if user_id is None:
-            col2.markdown("Log in to rate")
+        if user_id is not None:
+            key = f"rate_{row['item_id']}"
+            col2.feedback(
+                "stars",
+                key=key,
+                on_change=update_rating,
+                args=(dataset, user_id, row["item_id"], row.get("rating", pd.NA), key),
+                disabled=user_id is None,
+            )
+        else:
+            col2.markdown(":material/star: Log in to rate")
 
     # Add note about limited results
     if len(df) >= n:

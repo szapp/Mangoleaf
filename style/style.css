@@ -47,6 +47,12 @@ span.highlight {
   font-weight: bold;
 }
 
+/* Secondary text color */
+span.secondary {
+  color: #909090;
+  font-size: 1em;
+}
+
 /* Recommendation row header text */
 h2.row_header {
   padding-bottom: 0px;
