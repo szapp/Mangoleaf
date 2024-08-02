@@ -27,7 +27,7 @@ hydrate_recommendation = frontend.add_mixed_recommendations(n=8)
 st.subheader("About Us", anchor=False)
 st.markdown(
     """
-Mangoleaf is brought to you by Max and Sören, passionate developers and data scientists dedicated
+MANGOLEAF is brought to you by Max and Sören, passionate developers and data scientists dedicated
 to enhancing your reading experience.
 """
 )
