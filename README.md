@@ -5,7 +5,10 @@
   <img alt="Mangoleaf" src="images/black_logo_transparent_background.png">
 </picture>
 
-Personal recommendations for books and mangas implemented using collaborative filtering based recommender systems
+Welcome to MANGOLEAF, your ultimate guide to discovering the best books and manga tailored to your tastes.
+Whether you're a seasoned reader or just starting, MANGOLEAF provides personalized recommendations to help you find your next favorite read.
+
+Personal recommendations for books and mangas implemented using collaborative filtering based recommender systems (popularity, user-based & item-based).
 
 ---
 
@@ -24,3 +27,5 @@ The datasets fueling the recommendations were modified from
 
 - https://www.kaggle.com/datasets/arashnic/book-recommendation-dataset
 - https://www.kaggle.com/datasets/dbdmobile/myanimelist-dataset
+
+The repository [MaxYurch/MANGOLEAF-APP](https://github.com/MaxYurch/MANGOLEAF-APP) is an adjacent implementation.
