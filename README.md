@@ -12,9 +12,13 @@ Personal recommendations for books and mangas implemented using collaborative fi
 
 ---
 
-<img src="https://github.com/user-attachments/assets/b0deb0a2-7918-4bd3-aa52-b936915b2abc" width="40%">
+<img src="https://github.com/user-attachments/assets/b0deb0a2-7918-4bd3-aa52-b936915b2abc" alt="" width="40%">
 &nbsp;
-<img src="https://github.com/user-attachments/assets/7b9276b8-dd56-43ae-b127-d819762d3093" width="40%">
+<img src="https://github.com/user-attachments/assets/7b9276b8-dd56-43ae-b127-d819762d3093" alt="" width="40%">
+<br>
+<img src="https://github.com/user-attachments/assets/29e523f2-6028-4979-9763-bc1d80e1ecb2" alt="" width="40%">
+&nbsp;
+<img src="https://github.com/user-attachments/assets/cac45dea-e3b6-4794-91e7-7fa08fc76295" alt="" width="40%">
 </div>
 
 ## Contributors
