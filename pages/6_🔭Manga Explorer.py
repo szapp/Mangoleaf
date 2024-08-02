@@ -95,9 +95,11 @@ user_id = authentication.get_user_info()["user_id"]
 def update_rating(item_id, rating_before, key):
     rating = st.session_state.get(key)
     if rating is not None:
-        rating = (rating + 1) * 2
-        print(f"User {user_id} updated rating for {item_id} from {rating_before} to {rating}")
-        query.update_rating("mangas", user_id, item_id, rating)
+        rating += 1
+        if rating != rating_before:
+            print(f"User {user_id} updated rating for {item_id} from {rating_before} to {rating}")
+            query.update_rating("mangas", user_id, item_id, rating)
+            st.toast("Rating updated", icon="⭐")
 
 
 # Load the database table into a DataFrame
@@ -120,8 +122,13 @@ df = pd.read_sql(query_str, Connection().get())
 # Filter the DataFrame using the filter function
 filtered_df = filter_dataframe(df)
 
-st.html("<br>")
+# Fill the ratings
+for _, row in filtered_df.iterrows():
+    if row.get("rating") is not None:
+        key = f"rate_{row["item_id"]}"
+        st.session_state[key] = row["rating"] - 1
 
+st.html("<br>")
 outer_columns = st.columns(3)
 for idx, (_, row) in enumerate(filtered_df.iterrows()):
     col1, col2 = outer_columns[idx % 3].columns([1, 3])
@@ -142,12 +149,22 @@ for idx, (_, row) in enumerate(filtered_df.iterrows()):
     col1.html(item)
     col2.markdown(f"**{row["title"]}**  \n{row["other_title"]}")
     key = f"rate_{row["item_id"]}"
-
-    if row.get("rating") is not None:
-        st.session_state[key] = (row["rating"] // 2) - 1
     col2.feedback(
-        "stars", key=key, on_change=update_rating, args=(row["item_id"], row.get("rating"), key),
+        "stars",
+        key=key,
+        on_change=update_rating,
+        args=(row["item_id"], row.get("rating"), key),
         disabled=user_id is None
     )
     if user_id is None:
         col2.markdown("Log in to rate")
+
+
+st.html(f"""
+<div style="width: 100%; display: flex; justify-content: center; margin-top: 20px;">
+    <div style="background-color: #202020; border: 1px solid #303030; border-radius:
+                8px; padding: 4px 12px;">
+        Showing the first {len(filtered_df)} results. Refine your search to see more.
+    </div>
+</div>
+""")
