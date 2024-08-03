@@ -323,6 +323,34 @@ def update_rating(dataset, user_id, item_id, rating):
         connection.commit()
 
 
+def export_user_data(user_id):
+    """
+    Get all user ratings from the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to get the ratings for
+
+    Returns
+    -------
+    df : pd.DataFrame
+        DataFrame with all user ratings
+    """
+    query = f"""
+    SELECT item_id::text, 'book' as dataset, rating, title, author as secondary FROM books_ratings
+    LEFT JOIN books USING (item_id)
+    WHERE user_id = {user_id}
+    UNION ALL
+    SELECT item_id::text, 'manga' as dataset, rating, title, other_title as secondary
+        FROM mangas_ratings
+    LEFT JOIN mangas USING (item_id)
+    WHERE user_id = {user_id}
+    """
+    df = pd.read_sql(query, Connection().get())
+    return df
+
+
 def get_filtered(dataset, n, user_id, where_query, query_params):
     """
     Get filtered items with rating from the database

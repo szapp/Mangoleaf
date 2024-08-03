@@ -87,6 +87,18 @@ st.html("<br>")
 image_operation()
 st.html("<hr>")
 
+# Download data
+if st.button("Export your ratings"):
+    df = query.export_user_data(user_id)
+    csv = df.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        "Press to Download",
+        csv,
+        f"{datetime.now().strftime('%Y-%m-%d_%H%M%S')}_user_data_{username}.csv",
+        "text/csv",
+        key="download_user_data",
+    )
+
 # Logout button
 if st.button("Logout"):
     authentication.reset()
