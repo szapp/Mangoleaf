@@ -219,6 +219,80 @@ def match_user_credentials(username, password):
     return user_info
 
 
+def get_extended_user_info(user_id):
+    """
+    Get extended user information from the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to get the information for
+
+    Returns
+    -------
+    user_info : dict
+        Extended user information
+    """
+    if user_id is None:
+        return dict()
+    query = f"""
+    SELECT user_id, about, registered, image FROM users
+    LEFT JOIN user_data USING (user_id)
+    WHERE user_id = {user_id}
+    """
+    user_info = pd.read_sql(query, Connection().get()).iloc[0].to_dict()
+    return user_info
+
+
+def set_user_image(user_id, image):
+    """
+    Set the user image in the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to set the image for
+
+    image : bytes
+        Image to set
+    """
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = """
+        INSERT INTO user_data (user_id, image)
+        VALUES (:user_id, :image)
+        ON CONFLICT (user_id) DO UPDATE
+        SET image = :image
+        """
+        connection.execute(text(query), dict(user_id=user_id, image=image))
+        connection.commit()
+
+
+def get_num_ratings(user_id):
+    """
+    Retrieve the number of ratings for a user
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to get the number of ratings for
+
+    Returns
+    -------
+    num_ratings : int
+        Number of ratings for the user
+    """
+    query = f"""
+    SELECT COUNT(*) FROM books_ratings
+    WHERE user_id = {user_id}
+    UNION ALL
+    SELECT COUNT(*) FROM mangas_ratings
+    WHERE user_id = {user_id}
+    """
+    num_ratings = pd.read_sql(query, Connection().get()).sum().values[0]
+    return num_ratings
+
+
 def update_rating(dataset, user_id, item_id, rating):
     """
     Update the rating of a book or manga in the database

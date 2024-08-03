@@ -2,10 +2,13 @@
 Functionality for the frontend of repeated tasks
 """
 
+import base64
+import io
 import re
 
 import pandas as pd
 import streamlit as st
+from PIL import Image
 
 from mangoleaf import authentication, query
 
@@ -497,6 +500,78 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
         </div>
         """
         )
+
+
+def load_profile_image(user_id):
+    """
+    Load the saved image for the user
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to load the image for
+
+    Returns
+    -------
+    image : str or None
+        Base64 encoded image or None if there is no image
+    """
+    user_info = query.get_extended_user_info(user_id)
+    return user_info["image"]
+
+
+def upload_profile_image(user_id, image_size_px=150):
+    """
+    Upload new user profile image
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to upload the image for
+
+    image_size_px : int, optional
+        Square image dimensions. Do not change: Hardcoding in CSS style
+        sheet! Default is 150
+
+    Returns
+    -------
+    success : bool
+        True if the image was uploaded successfully
+    """
+    image_file = st.file_uploader("Upload your profile picture", type=["png", "jpg", "jpeg"])
+    if image_file is not None:
+        if image_file.size > 2 * 1024 * 1024:  # 2MB limit
+            st.toast("File size exceeds the 2MB limit. Please upload a smaller file.", icon="⚠️")
+            return False
+
+        im = Image.open(image_file)
+
+        # Crop the image to a square
+        width, height = im.size
+        max_center = min(width, height) // 2
+        center = width // 2, height // 2
+        im = im.crop(
+            (
+                center[0] - max_center,
+                center[1] - max_center,
+                center[0] + max_center,
+                center[1] + max_center,
+            )
+        )
+
+        # Resize the image
+        im = im.resize((image_size_px, image_size_px))
+
+        # Save to bytes as PNG
+        img_byte_arr = io.BytesIO()
+        im.save(img_byte_arr, format="PNG")
+
+        # Save to database
+        im_bytes = img_byte_arr.getvalue()
+        im_b64 = base64.b64encode(im_bytes)
+        query.set_user_image(user_id, im_b64.decode("utf-8"))
+        return True
+    return False
 
 
 def add_sidebar_login():

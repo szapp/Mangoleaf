@@ -12,6 +12,7 @@ def reset():
     st.session_state["username"] = None
     st.session_state["full_name"] = None
     st.session_state["user_id"] = None
+    st.session_state["registered"] = None
     for key in st.session_state.keys():
         if key.startswith("rate_"):
             del st.session_state[key]
@@ -26,6 +27,7 @@ def authenticate(username, password):
     st.session_state["username"] = user_info["username"]
     st.session_state["full_name"] = user_info["full_name"]
     st.session_state["user_id"] = user_info["user_id"]
+    st.session_state["registered"] = user_info["registered"]
     return True
 
 
@@ -38,4 +40,9 @@ def get_user_info():
         username=st.session_state.get("username", None),
         full_name=st.session_state.get("full_name", None),
         user_id=st.session_state.get("user_id", None),
+        registered=st.session_state.get("registered", None),
     )
+
+
+def get_extended_user_info():
+    return query.get_extended_user_info(st.session_state.get("user_id", None))

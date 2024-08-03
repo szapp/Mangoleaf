@@ -2,12 +2,11 @@
 User profile
 """
 
-import os
+from datetime import datetime
 
 import streamlit as st
-from PIL import Image
 
-from mangoleaf import authentication, frontend
+from mangoleaf import authentication, frontend, query
 
 frontend.add_config()
 frontend.add_style()
@@ -21,75 +20,74 @@ if not authentication.is_authenticated():
     st.warning("Please log in from the home page to access this page.")
     st.stop()  # Stop further execution if not authenticated
 
+# Get user information
 user_data = authentication.get_user_info()
+user_id = user_data["user_id"]
+username = user_data["username"]
+full_name = user_data["full_name"]
+registered = user_data.get("registered")
 
-st.markdown(f"**Username:** {user_data['username']}")
-st.markdown(f"**Name:** {user_data['full_name']}")
+# Get number of ratings
+items_rated = query.get_num_ratings(user_id)
 
-# Profile picture upload
-
-# Directory to store uploaded images
-UPLOAD_FOLDER = "uploaded_images"
-
-# Ensure the directory exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-
-def save_image(image_file, user_id):
-    """Save the uploaded image to a file."""
-    file_path = os.path.join(UPLOAD_FOLDER, f"{user_id}.png")
-    with open(file_path, "wb") as f:
-        f.write(image_file.getbuffer())
-    return file_path
-
-
-def load_image(user_id):
-    """Load the saved image for the user."""
-    file_path = os.path.join(UPLOAD_FOLDER, f"{user_id}.png")
-    if os.path.exists(file_path):
-        return Image.open(file_path)
-    return None
-
-
-def user_profile(user_id):
-    """Display the user profile page."""
-
-    # Load and display the existing profile image
-    profile_image = load_image(user_id)
-
-    if profile_image is not None:
-        st.image(profile_image, caption="Profile Picture", width=150)
-
-        # Show update button if an image is already uploaded
-        if st.button("Update Profile Picture"):
-            image_file = st.file_uploader(
-                "Upload a new profile picture", type=["png", "jpg", "jpeg"]
-            )
-
-            if image_file is not None:
-                if image_file.size > 2 * 1024 * 1024:  # 2MB limit
-                    st.error("File size exceeds the 2MB limit. Please upload a smaller file.")
-                else:
-                    # Save the uploaded image
-                    save_image(image_file, user_id)
-                    st.success("Profile picture updated!")
-                    st.image(load_image(user_id), caption="Profile Picture", width=150)
+if isinstance(registered, datetime):
+    days_registered = (datetime.now() - registered).days
+    if days_registered == 0:
+        member_since = "Registered today"
+    elif days_registered < 4:
+        member_since = f"Registered {days_registered} days ago"
+    elif days_registered < 8:
+        member_since = "Registered this week"
     else:
-        # Show upload option if no image is uploaded yet
-        image_file = st.file_uploader("Upload your profile picture", type=["png", "jpg", "jpeg"])
+        member_since = "Registered " + registered.strftime("%Y-%m-%d")
+else:
+    member_since = ""
 
-        if image_file is not None:
-            if image_file.size > 2 * 1024 * 1024:  # 2MB limit
-                st.error("File size exceeds the 2MB limit. Please upload a smaller file.")
-            else:
-                # Save the uploaded image
-                save_image(image_file, user_id)
-                st.success("Profile picture uploaded!")
-                st.image(load_image(user_id), caption="Profile Picture", width=150)
+# Profile card
+profile_card_html = f"""
+<div class="profile_card_container">
+    <div class="profile_card_overflow"></div>
+    <div class="profile_card_image_container">{{content}}</div>
+    <div class="profile_card_info_container">
+        <div>{full_name}</div>
+        <div>{username}</div>
+        <div>{member_since}</div>
+        <div>Items rated: {items_rated}</div>
+    </div>
+</div>
+"""
+image_html = "<img src='data:image/png;base64,{profile_image}' alt=''>"
+placeholder_html = "<div class='img_placeholder'><div>No picture</div></div>"
+
+# Placeholder for the profile card to be dynamically updated
+profile_card = st.empty()
+profile_card.html(profile_card_html.format(content=placeholder_html))
 
 
-user_profile(user_data["user_id"])
+@st.fragment
+def image_operation():
+    """This is enclosed in a fragment to prevent reloading the page"""
+    profile_image = frontend.load_profile_image(user_id)
 
+    if profile_image:
+        profile_card.html(
+            profile_card_html.format(content=image_html.format(profile_image=profile_image))
+        )
+
+        if st.button("Remove Profile Picture"):
+            query.set_user_image(user_id, None)
+            st.rerun(scope="fragment")
+    else:
+        profile_card.html(profile_card_html.format(content=placeholder_html))
+        if frontend.upload_profile_image(user_id):
+            st.rerun(scope="fragment")
+
+
+st.html("<br>")
+image_operation()
+st.html("<hr>")
+
+# Logout button
 if st.button("Logout"):
     authentication.reset()
     st.success("You have logged out.")

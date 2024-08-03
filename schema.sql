@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS mangas_user_based CASCADE;
 
 DROP TABLE IF EXISTS books CASCADE;
 DROP TABLE IF EXISTS mangas CASCADE;
+DROP TABLE IF EXISTS user_data CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 -- User table (dynamic)
@@ -19,9 +20,14 @@ CREATE TABLE users (
   username VARCHAR(50) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
   full_name VARCHAR(255) NOT NULL,
-  about TEXT,
-  image VARCHAR(255),
   registered TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_data (
+  user_id INTEGER PRIMARY KEY,
+  about VARCHAR(255),
+  image TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- Book and manga tables (static)
