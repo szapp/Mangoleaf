@@ -128,7 +128,7 @@ def make_row(df, n, context=st):
 
 def add_recommendations(dataset, user_id, n):
     # Check if user_id has rated items in that dataset
-    user_id_valid = user_id if query.user_exists(user_id, dataset) else None
+    user_id_valid = user_id if query.user_rating_exists(user_id, dataset) else None
 
     # First row
     add_row_header(f"Popular {dataset}")
@@ -607,13 +607,29 @@ def add_sidebar_login():
         with st.sidebar.form("login_mask", border=False):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
-            submit = st.form_submit_button("Login")
+            col1, col_grow, col2 = st.columns([1, 0.01, 1])
+            col_grow.html("<div class='login_submit_spacer'></div>")
+            submit_login = col1.form_submit_button("Login")
+            submit_register = col2.form_submit_button("Sign up", type="secondary")
 
         # Sidebar button for login
-        if submit:
+        if submit_login:
             if authentication.authenticate(username, password):
                 st.rerun()
             else:
                 st.sidebar.error("Username/password is incorrect")
+
+        # Sidebar button for registration
+        if submit_register:
+            min_length = 8
+            status = authentication.register(username, password, min_length)
+            if status is True:
+                st.sidebar.success("Registration successful! Please log in")
+            elif status == "user_exists":
+                st.sidebar.error("Username is already taken")
+            elif status == "password_short":
+                st.sidebar.error(f"Password is too short (minimum {min_length} characters)")
+            else:
+                st.sidebar.error("Registration failed")
 
         st.sidebar.info("Please log in to access the content")

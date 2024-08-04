@@ -35,6 +35,15 @@ def is_authenticated():
     return st.session_state.get("authenticated", False)
 
 
+def register(username, password, min_length=8):
+    if query.user_exists(username):
+        return "user_exists"
+    if len(password) < min_length:
+        return "password_short"
+    success = query.register_user(username, password)
+    return success
+
+
 def get_user_info():
     return dict(
         username=st.session_state.get("username", None),

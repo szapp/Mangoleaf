@@ -160,7 +160,7 @@ def get_random_high_rated(user_id, dataset):
     return df
 
 
-def user_exists(user_id, dataset):
+def user_rating_exists(user_id, dataset):
     """
     Check if a user exists in the dataset
 
@@ -185,6 +185,27 @@ def user_exists(user_id, dataset):
     """
     df = pd.read_sql(query, Connection().get())
     return len(df) > 0
+
+
+def user_exists(username):
+    """
+    Check if a user exists in the database
+
+    Parameters
+    ----------
+    username : str
+        Username to check
+
+    Returns
+    -------
+    bool
+        True if the user exists, False otherwise
+    """
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = "SELECT * FROM users WHERE username = :username"
+        result = connection.execute(text(query), dict(username=username)).fetchone()
+    return result is not None
 
 
 def match_user_credentials(username, password):
@@ -217,6 +238,56 @@ def match_user_credentials(username, password):
 
         user_info = dict(result._mapping)
     return user_info
+
+
+def next_user_id():
+    """
+    Get the next user ID to use
+
+    Returns
+    -------
+    user_id : int
+        Next user ID
+    """
+    query = "SELECT MAX(user_id) FROM users"
+    user_id = pd.read_sql(query, Connection().get()).iloc[0, 0]
+    return int(user_id) + 1 if user_id is not None else 0
+
+
+def register_user(username, password):
+    """
+    Register a new user in the database
+
+    Parameters
+    ----------
+    username : str
+        Username of the new user
+
+    password : str
+        Password of the new user
+
+    Returns
+    -------
+    success : bool
+        True if the registration was successful, False otherwise
+    """
+    user_id = next_user_id()
+
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = """
+        INSERT INTO users (user_id, username, password, full_name)
+        VALUES (:user_id, :username, :password, :username)
+        """
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+        connection.execute(
+            text(query), dict(username=username, password=hashed_password, user_id=user_id)
+        )
+        connection.commit()
+
+    # Verify that the user was registered
+    return user_exists(username)
 
 
 def get_extended_user_info(user_id):
