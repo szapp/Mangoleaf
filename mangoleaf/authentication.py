@@ -38,6 +38,8 @@ def is_authenticated():
 def register(username, password, min_length=8):
     if query.user_exists(username):
         return "user_exists"
+    if len(username) < 5:
+        return "username_short"
     if len(password) < min_length:
         return "password_short"
     success = query.register_user(username, password)

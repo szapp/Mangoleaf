@@ -627,6 +627,8 @@ def add_sidebar_login():
                 st.sidebar.success("Registration successful! Please log in")
             elif status == "user_exists":
                 st.sidebar.error("Username is already taken")
+            elif status == "username_short":
+                st.sidebar.error("Username is too short (minimum 5 characters)")
             elif status == "password_short":
                 st.sidebar.error(f"Password is too short (minimum {min_length} characters)")
             else:
