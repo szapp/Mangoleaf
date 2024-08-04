@@ -66,7 +66,7 @@ Implementation was done using agile methods including daily stand-ups, iterative
 <div align="center">
 <picture>
 
-  ![schedule](https://github.com/user-attachments/assets/86bf1b24-abc7-4517-a401-27b3fa4ccc0f)
+  ![schedule](https://github.com/user-attachments/assets/13da011d-cd98-4512-b429-06d3ed1d9869)
 </picture>
 </div>
 
