@@ -5,6 +5,8 @@
   <img alt="Mangoleaf" src="images/black_logo_transparent_background.png">
 </picture>
 
+[![streamlit](https://img.shields.io/badge/deployed-streamlit-4c1?logo=streamlit&logoColor=white)](https://mangoleaf-dev.streamlit.app)
+
 Welcome to MANGOLEAF, your ultimate guide to discovering the best books and manga tailored to your tastes.
 Whether you're a seasoned reader or just starting, MANGOLEAF provides personalized recommendations to help you find your next favorite read.
 
