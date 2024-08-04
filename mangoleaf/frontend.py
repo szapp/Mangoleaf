@@ -583,10 +583,22 @@ def upload_profile_image(user_id, image_size_px=150):
 def add_sidebar_login():
     if authentication.is_authenticated():
         user = authentication.get_user_info()
-        st.sidebar.markdown(f"Logged in as {user['username']}")
-        if st.sidebar.button("Logout", key="sidebar_logout"):
+        profile_image = load_profile_image(user["user_id"])
+        if profile_image is not None:
+            col1, col2 = st.sidebar.columns([1, 2.25])
+            image_html = "<img src='data:image/png;base64,{profile_image}' alt='' class='welcome'>"
+            col1.markdown(image_html.format(profile_image=profile_image), unsafe_allow_html=True)
+            ct = col2
+        else:
+            ct = st.sidebar
+        ct.html(
+            f"""
+        <div class="welcome_text">Welcome, <b>{user['full_name']}</b></div>
+        <div class="welcome_text_overflow"></div>
+        """
+        )
+        if ct.button("Logout", key="sidebar_logout"):
             authentication.reset()
-            st.sidebar.info("You have logged out")
             st.rerun()
     else:
         st.sidebar.title("Login")
@@ -600,8 +612,6 @@ def add_sidebar_login():
         # Sidebar button for login
         if submit:
             if authentication.authenticate(username, password):
-                user = authentication.get_user_info()
-                st.sidebar.success(f"Welcome {user['username']}")
                 st.rerun()
             else:
                 st.sidebar.error("Username/password is incorrect")
