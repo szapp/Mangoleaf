@@ -482,6 +482,7 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
                 <b>{title}</b><br />
                 <span class="secondary">{row.iloc[2]}</span><br />
                 <span class="secondary">{categories}</span>
+                <div class="explorer_details_screen"></div>
             """
         )
         if user_id is not None:
