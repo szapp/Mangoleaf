@@ -13,7 +13,7 @@ def singleton(class_):
     instances = {}
 
     def getinstance(*args, **kwargs):
-        if class_ not in instances:
+        if class_ not in instances or kwargs.pop("force_new_instance", False):
             instances[class_] = class_(*args, **kwargs)
         return instances[class_]
 

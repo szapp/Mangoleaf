@@ -12,12 +12,11 @@ import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy.sql import text
 
-from mangoleaf.connection import Connection
+from mangoleaf import Connection
 
 
 def main():
     # Establish a connection to the database
-
     db_engine = Connection().get()
 
     # Create schema from SQL file
@@ -95,6 +94,17 @@ def main():
     # Fill the ratings: Mangas
     df = mangas_ratings.rename(columns={"anime_id": "item_id"})
     df.to_sql("mangas_ratings", db_engine, if_exists="append", index=False)
+
+    # Create backup tables for easy resetting
+    print("Create backup tables")
+    query = """
+    CREATE TABLE users_original AS TABLE users;
+    CREATE TABLE books_ratings_original AS TABLE books_ratings;
+    CREATE TABLE mangas_ratings_original AS TABLE mangas_ratings;
+    """
+    with db_engine.connect() as connection:
+        connection.execute(text(query))
+        connection.commit()
 
     # Close the connection
     db_engine.dispose()

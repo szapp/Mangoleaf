@@ -1,22 +1,11 @@
+-- Drop dynamic tables
+
 DROP TABLE IF EXISTS books_ratings CASCADE;
 DROP TABLE IF EXISTS mangas_ratings CASCADE;
-DROP TABLE IF EXISTS books_ratings_original CASCADE;
-DROP TABLE IF EXISTS mangas_ratings_original CASCADE;
-
-DROP TABLE IF EXISTS books_popular CASCADE;
-DROP TABLE IF EXISTS mangas_popular CASCADE;
-DROP TABLE IF EXISTS books_item_based CASCADE;
-DROP TABLE IF EXISTS mangas_item_based CASCADE;
-DROP TABLE IF EXISTS books_user_based CASCADE;
-DROP TABLE IF EXISTS mangas_user_based CASCADE;
-
-DROP TABLE IF EXISTS books CASCADE;
-DROP TABLE IF EXISTS mangas CASCADE;
 DROP TABLE IF EXISTS user_data CASCADE;
-DROP TABLE IF EXISTS users_original CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
--- User table (dynamic)
+-- Recreate dynamic tables (including constraints)
 
 CREATE TABLE users (
   user_id INTEGER PRIMARY KEY,
@@ -32,26 +21,6 @@ CREATE TABLE user_data (
   image TEXT,
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
-
--- Book and manga tables (static)
-
-CREATE TABLE books (
-  item_id VARCHAR(20) PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  author VARCHAR(255),
-  year INTEGER,
-  image VARCHAR(255)
-);
-
-CREATE TABLE mangas (
-  item_id INTEGER PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  other_title VARCHAR(255),
-  genres VARCHAR(255),
-  image VARCHAR(255)
-);
-
--- Ratings tables (semi-static)
 
 CREATE TABLE books_ratings (
   user_id INTEGER NOT NULL,
@@ -70,3 +39,28 @@ CREATE TABLE mangas_ratings (
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (item_id) REFERENCES mangas(item_id)
 );
+
+-- Copy data from original tables
+
+INSERT INTO users (
+  user_id,
+  username,
+  password,
+  full_name,
+  registered
+)
+SELECT * FROM users_original;
+
+INSERT INTO books_ratings (
+  user_id,
+  item_id,
+  rating
+)
+SELECT * FROM books_ratings_original;
+
+INSERT INTO mangas_ratings (
+  user_id,
+  item_id,
+  rating
+)
+SELECT * FROM mangas_ratings_original;

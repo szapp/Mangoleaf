@@ -23,7 +23,7 @@ jobs:
 
       - name: Reset database and set inital recommendations
         run: |
-          python create_schema.py
+          python reset_database.py
           python update_database.py
         env:
           POSTGRES_USER: "${{ secrets.POSTGRES_USER }}"
