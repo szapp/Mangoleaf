@@ -9,6 +9,7 @@ from the cleaned CSV files in the data folder.
 
 import bcrypt
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy.sql import text
 
 from mangoleaf.connection import Connection
@@ -74,7 +75,13 @@ def main():
     dummy_password = bcrypt.hashpw(b"booksandmanga", bcrypt.gensalt()).decode("utf-8")
     passwords = [dummy_password] * len(user_id)
     df = pd.DataFrame(
-        dict(user_id=user_id, username=usernames, password=passwords, full_name=full_names)
+        dict(
+            user_id=user_id,
+            username=usernames,
+            password=passwords,
+            full_name=full_names,
+            registered="2024-07-23",
+        )
     )
     df.to_sql("users", db_engine, if_exists="append", index=False)
 
@@ -95,4 +102,5 @@ def main():
 
 
 if __name__ == "__main__":
+    load_dotenv(".streamlit/secrets.toml")
     main()

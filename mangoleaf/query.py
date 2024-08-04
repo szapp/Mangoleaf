@@ -275,6 +275,29 @@ def next_user_id():
     return int(user_id) + 1 if user_id is not None else 0
 
 
+def list_users_since(date):
+    """
+    List all active users in the database
+
+    Parameters
+    ----------
+    date : str
+        Date to filter users from
+
+    Returns
+    -------
+    user_ids : pd.DataFrame
+        DataFrame with all active users
+    """
+    query = """
+    SELECT user_id FROM users
+    WHERE registered >= %(date)s
+    ORDER BY registered ASC
+    """
+    user_ids = pd.read_sql(query, Connection().get(), params=dict(date=date)).user_id.to_list()
+    return user_ids
+
+
 def register_user(username, password):
     """
     Register a new user in the database
