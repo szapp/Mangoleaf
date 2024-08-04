@@ -58,10 +58,10 @@ profile_card_html = f"""
 """
 image_html = "<img src='data:image/png;base64,{profile_image}' alt=''>"
 placeholder_html = "<div class='img_placeholder'><div>No picture</div></div>"
+loading_html = "<div class='img_loading'><div></div></div>"
 
 # Placeholder for the profile card to be dynamically updated
 profile_card = st.empty()
-profile_card.html(profile_card_html.format(content=placeholder_html))
 
 
 @st.fragment
@@ -84,6 +84,7 @@ def image_operation():
 
 
 st.html("<br>")
+profile_card.html(profile_card_html.format(content=loading_html))
 image_operation()
 st.html("<hr>")
 

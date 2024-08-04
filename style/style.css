@@ -115,6 +115,21 @@ div.profile_card_image_container > div.img_placeholder > div {
   padding: 2px 4px;
   opacity: 0.75;
 }
+div.profile_card_image_container > div.img_loading {
+  width: 100%;
+  height: 100%;
+  background-color: #303030;
+}
+div.profile_card_image_container > div.img_loading > div {
+  width: 100%;
+  height: 100%;
+  filter: blur(40px);
+  opacity: 0.7;
+  background: conic-gradient(
+     red 6deg, orange 6deg 18deg, yellow 18deg 45deg,
+     green 45deg 110deg, blue 110deg 200deg, purple 200deg);
+  animation: spin 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 /* Profile: user information */
 div.profile_card_info_container {
   margin-left: 25px;
@@ -235,6 +250,11 @@ div.rec_element:hover div.rec_text {
   }
   50% {
     opacity: .5;
+  }
+}
+@keyframes spin {
+  100% {
+    transform:rotate(360deg);
   }
 }
 
