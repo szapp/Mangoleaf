@@ -41,7 +41,7 @@ def add_header_logo(header):
 
 
 def add_sidebar_logo():
-    st.sidebar.image("images/mango_logo.png", use_column_width=True)
+    st.sidebar.image("images/mango_logo_500.png", use_column_width=True)
 
 
 def add_user_input(default_user_id):
