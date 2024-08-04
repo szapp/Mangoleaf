@@ -12,13 +12,13 @@ Personal recommendations for books and mangas implemented using collaborative fi
 
 ---
 
-<img src="https://github.com/user-attachments/assets/b0deb0a2-7918-4bd3-aa52-b936915b2abc" alt="" width="40%">
+<a href="https://github.com/user-attachments/assets/b0deb0a2-7918-4bd3-aa52-b936915b2abc" target="_blank"><img src="https://github.com/user-attachments/assets/abb83a94-6ab0-424c-af95-d77cf288de1e" alt="" width="40%" /></a>
 &nbsp;
-<img src="https://github.com/user-attachments/assets/7b9276b8-dd56-43ae-b127-d819762d3093" alt="" width="40%">
-<br>
-<img src="https://github.com/user-attachments/assets/04f49f85-da5e-46ad-aa94-8e0d1f8acdd7" alt="" width="40%">
+<a href="https://github.com/user-attachments/assets/7b9276b8-dd56-43ae-b127-d819762d3093" target="_blank"><img src="https://github.com/user-attachments/assets/38233220-5045-4e95-a7e2-933111a556a2" alt="" width="40%" /></a>
+<br />
+<a href="https://github.com/user-attachments/assets/46ad716d-2336-44ba-9b8b-6ed6cc868ce7" target="_blank"><img src="https://github.com/user-attachments/assets/18dfe85f-3621-44fc-a07b-0d09bf57d526" alt="" width="40%" /></a>
 &nbsp;
-<img src="https://github.com/user-attachments/assets/03ca0624-c918-4843-adc0-c5e183f2f8b6" alt="" width="40%">
+<a href="https://github.com/user-attachments/assets/1a4f6d30-4922-4538-9b3c-9f8e4cb009ac" target="_blank"><img src="https://github.com/user-attachments/assets/e9e43d70-ebe9-4fd9-a001-8f3098e4335c" alt="" width="40%" /></a>
 </div>
 
 ## Contributors
