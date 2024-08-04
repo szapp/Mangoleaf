@@ -36,13 +36,30 @@ def is_authenticated():
 
 
 def register(username, password, min_length=8):
-    if query.user_exists(username):
+    if query.username_exists(username):
         return "user_exists"
     if len(username) < 5:
         return "username_short"
     if len(password) < min_length:
         return "password_short"
     success = query.register_user(username, password)
+    return success
+
+
+def update_full_name(user_id, new_full_name):
+    new_full_name = new_full_name.strip()
+    if len(new_full_name) < 5:
+        return "name_short"
+    success = query.update_full_name(user_id, new_full_name)
+    if success:
+        st.session_state["full_name"] = new_full_name
+    return success
+
+
+def update_password(user_id, new_password, min_length=8):
+    if len(new_password) < min_length:
+        return "password_short"
+    success = query.update_password(user_id, new_password)
     return success
 
 

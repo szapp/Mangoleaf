@@ -187,7 +187,28 @@ def user_rating_exists(user_id, dataset):
     return len(df) > 0
 
 
-def user_exists(username):
+def user_exists(user_id):
+    """
+    Check if a user exists in the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to check
+
+    Returns
+    -------
+    bool
+        True if the user exists, False otherwise
+    """
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = "SELECT * FROM users WHERE user_id = :user_id"
+        result = connection.execute(text(query), dict(user_id=user_id)).fetchone()
+    return result is not None
+
+
+def username_exists(username):
     """
     Check if a user exists in the database
 
@@ -287,7 +308,136 @@ def register_user(username, password):
         connection.commit()
 
     # Verify that the user was registered
-    return user_exists(username)
+    return username_exists(username) and user_exists(user_id)
+
+
+def update_full_name(user_id, new_full_name):
+    """
+    Update the full name of a user in the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to update the full name for
+
+    new_full_name : str
+        New full name of the user
+
+    Returns
+    -------
+    success : bool
+        True if the update was successful, False otherwise
+    """
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = """
+        UPDATE users
+        SET full_name = :full_name
+        WHERE user_id = :user_id
+        """
+        connection.execute(text(query), dict(full_name=new_full_name, user_id=user_id))
+        connection.commit()
+
+    # Verify that the full name was updated
+    success = get_user_info(user_id)["full_name"] == new_full_name
+    return success
+
+
+def update_password(user_id, new_password):
+    """
+    Update the password of a user in the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to update the password for
+
+    new_password : str
+        New password of the user
+
+    Returns
+    -------
+    success : bool
+        True if the update was successful, False otherwise
+    """
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(new_password.encode("utf-8"), salt).decode("utf-8")
+
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = """
+        UPDATE users
+        SET password = :password
+        WHERE user_id = :user_id
+        """
+        connection.execute(text(query), dict(password=hashed_password, user_id=user_id))
+        connection.commit()
+
+    # Verify that the password was updated
+    check = match_user_credentials(get_user_info(user_id)["username"], new_password)
+    success = check is not None
+    return success
+
+
+def delete_user(user_id):
+    """
+    Delete a user from the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to delete
+
+    Returns
+    -------
+    success : bool
+        True if the deletion was successful, False otherwise
+    """
+    engine = Connection().get()
+    with engine.connect() as connection:
+        query = """
+        DELETE FROM user_data
+        WHERE user_id = :user_id;
+        DELETE FROM books_ratings
+        WHERE user_id = :user_id;
+        DELETE FROM mangas_ratings
+        WHERE user_id = :user_id;
+        DELETE FROM books_user_based
+        WHERE user_id = :user_id;
+        DELETE FROM mangas_user_based
+        WHERE user_id = :user_id;
+        DELETE FROM users
+        WHERE user_id = :user_id;
+        """
+        connection.execute(text(query), dict(user_id=user_id))
+        connection.commit()
+
+    # Verify that the user was deleted
+    return not user_exists(user_id)
+
+
+def get_user_info(user_id):
+    """
+    Get user information from the database
+
+    Parameters
+    ----------
+    user_id : int
+        ID of the user to get the information for
+
+    Returns
+    -------
+    user_info : dict
+        User information
+    """
+    if user_id is None:
+        return dict()
+    query = f"""
+    SELECT user_id, username, full_name FROM users
+    WHERE user_id = {user_id}
+    """
+    user_info = pd.read_sql(query, Connection().get()).iloc[0].to_dict()
+    return user_info
 
 
 def get_extended_user_info(user_id):

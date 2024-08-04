@@ -3,6 +3,7 @@ User profile
 """
 
 from datetime import datetime
+from time import sleep
 
 import streamlit as st
 
@@ -85,10 +86,70 @@ def image_operation():
             st.rerun(scope="fragment")
 
 
-st.html("<br>")
-profile_card.html(profile_card_html.format(content=loading_html))
-image_operation()
-st.html("<hr>")
+st.html("<br />")
+with st.container(border=True):
+
+    # Change full_name
+    profile_card.html(profile_card_html.format(content=loading_html))
+    new_full_name = st.text_input(
+        "Change your name",
+        full_name,
+        max_chars=50,
+        key="new_name",
+    )
+    del st.session_state["new_name"]
+    if new_full_name != full_name:
+        success = authentication.update_full_name(user_id, new_full_name)
+        if success is True:
+            st.rerun()
+        elif success == "name_short":
+            st.warning("Name must be at least 5 characters long.")
+        else:
+            st.error("An error occurred while updating your name.")
+
+    # Change password
+    new_password = st.text_input(
+        "Change your password",
+        "",
+        placeholder="*****",
+        type="password",
+        max_chars=50,
+        key="new_password",
+    )
+    del st.session_state["new_password"]  # For safety
+    if new_password:
+        min_length = 8
+        success = authentication.update_password(user_id, new_password, min_length)
+        if success is True:
+            st.rerun()
+        elif success == "password_short":
+            st.warning("Password must be at least {min_length} characters long.")
+        else:
+            st.error("An error occurred while updating your password.")
+
+    # Update or delete user picture
+    image_operation()
+
+    # Delete account
+    delete_account = st.text_input(
+        "Permanently delete your account (type 'delete' to confirm)",
+        "",
+        max_chars=6,
+        placeholder="delete",
+        key="delete_account",
+    )
+    del st.session_state["delete_account"]
+    if delete_account:
+        success = query.delete_user(user_id)
+        if not success:
+            st.error("An error occurred while deleting your user account.")
+        else:
+            authentication.reset()
+            st.success("Your account has been deleted.")
+            with st.spinner("Logging you out..."):
+                sleep(3)
+                st.rerun()
+st.html("<br />")
 
 # Download data
 if st.button("Export your ratings"):
