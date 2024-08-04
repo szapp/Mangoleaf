@@ -7,6 +7,8 @@ The schema is described in the file schema.sql. The data is loaded
 from the cleaned CSV files in the data folder.
 """
 
+import os
+
 import bcrypt
 import pandas as pd
 from dotenv import load_dotenv
@@ -71,7 +73,9 @@ def main():
     user_id = list(user_id)
     usernames = [f"user_{i}" for i in user_id]
     full_names = [f"User {i}" for i in user_id]
-    dummy_password = bcrypt.hashpw(b"booksandmanga", bcrypt.gensalt()).decode("utf-8")
+    salt = bcrypt.gensalt()
+    general_password = os.getenv("DUMMY_PASSWORD")
+    dummy_password = bcrypt.hashpw(general_password.encode("utf-8"), salt).decode("utf-8")
     passwords = [dummy_password] * len(user_id)
     df = pd.DataFrame(
         dict(
