@@ -457,9 +457,9 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
     """
 
     # Add the items in a grid
-    outer_columns = st.columns(3)
+    outer_columns = st.columns(3, vertical_alignment="top")
     for idx, (_, row) in enumerate(df.iterrows()):
-        col1, col2 = outer_columns[idx % 3].columns([1, 3])
+        col1, col2 = outer_columns[idx % 3].columns([1, 3], vertical_alignment="top")
 
         col1.html(
             html_element.format(
@@ -471,7 +471,12 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
             )
         )
         title = tv_keywords.sub("", row["title"])
-        categories = " &bull; ".join(str(row.iloc[3]).split("|"))
+        if dataset == "mangas":
+            cat_list = str(row.iloc[3]).split("|")
+            elements = "".join([f"<span>{cat}</span>" for cat in cat_list])
+            categories = f"<div class='explorer_genres'>{elements}</div>"
+        else:
+            categories = row.iloc[3]
         col2.html(
             f"""
                 <b>{title}</b><br />

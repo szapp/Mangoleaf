@@ -271,3 +271,18 @@ div.explorer_info > div {
   border-radius: 8px;
   padding: 4px 12px;
 }
+/* Genres */
+div.explorer_genres {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 3px;
+  font-size: 0.8em;
+}
+div.explorer_genres > span {
+  border: 1px solid #652b1e;
+  background-color: #1e0d08;
+  color: #d0d0d0;
+  border-radius: 6px;
+  padding: 0px 4px;
+}
