@@ -344,3 +344,7 @@ div.welcome_text_overflow {
 div:has(> div > div > div > div > div > div > div.login_submit_spacer) {
   justify-content: space-between;
 }
+div:has(> div > div > div > div > div > div > div.login_submit_spacer) div {
+  width: unset!important;
+  flex: unset;
+}
