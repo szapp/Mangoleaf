@@ -31,9 +31,11 @@ registered = user_data.get("registered")
 items_rated = query.get_num_ratings(user_id)
 
 if isinstance(registered, datetime):
-    days_registered = (datetime.now() - registered).days
+    days_registered = (datetime.now().date() - registered.date()).days
     if days_registered == 0:
         member_since = "Registered today"
+    elif days_registered == 1:
+        member_since = "Registered yesterday"
     elif days_registered < 4:
         member_since = f"Registered {days_registered} days ago"
     elif days_registered < 8:
