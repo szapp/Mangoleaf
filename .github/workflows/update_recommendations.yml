@@ -2,6 +2,10 @@ name: update
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '42 4 * * *'
+# Update the personalized recommendations of each user
+# This happens every 24 hours (every day at 4:42 AM)
 
 jobs:
   update:

@@ -2,6 +2,12 @@ name: reset
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '13 2 1,6,11,16,21,26 * *'
+# Reset the database every five days to its original state
+# This happens at 2:13 AM on the 1st, 6th, 11th, 16th, 21st, and 26th of each month
+# This action deletes all users, their ratings, and recommendations for the purpose
+# of containing spam and abuse in this small demo project
 
 jobs:
   update:

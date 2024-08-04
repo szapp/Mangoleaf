@@ -188,7 +188,9 @@ def add_recommendations(dataset, user_id, n):
                 make_row(df, n, third_row)
             else:
                 third_row.info(
-                    "**All caught up!**  \nStart rating more items to get more recommendations"
+                    "**All caught up!**"
+                    "   \nStart rating more items to get more recommendations"
+                    "   \nRecommendations are updated every 24 hours"
                 )
 
     return hydrate
