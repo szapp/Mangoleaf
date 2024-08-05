@@ -463,14 +463,15 @@ def add_explorer(dataset, user_id, n, filter_options, display_names=None):
     for idx, (_, row) in enumerate(df.iterrows()):
         col1, col2 = outer_columns[idx % 3].columns([1, 3], vertical_alignment="top")
 
-        col1.html(
+        col1.markdown(
             html_element.format(
                 url=url,
                 item_id=row["item_id"],
                 title=row["title"],
                 secondary=row.iloc[2],
                 img_src=row["image"],
-            )
+            ),
+            unsafe_allow_html=True,
         )
         title = tv_keywords.sub("", row["title"])
         if dataset == "mangas":
