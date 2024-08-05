@@ -11,6 +11,10 @@ frontend.add_style()
 frontend.add_sidebar_login()
 frontend.add_sidebar_logo()
 
+# Social links
+social_max = frontend.add_social_links("max", True, True)
+social_soren = frontend.add_social_links("soren", True, True)
+
 st.image("images/white_logo_transparent_background.png")
 
 st.markdown(
@@ -26,10 +30,11 @@ hydrate_recommendation = frontend.add_mixed_recommendations(n=8)
 
 st.subheader("About Us", anchor=False)
 st.markdown(
-    """
-MANGOLEAF is brought to you by Max and Sören, passionate developers and data scientists dedicated
-to enhancing your reading experience.
-"""
+    f"""
+MANGOLEAF is brought to you by Max {social_max} and Sören {social_soren}, passionate developers and
+data scientists dedicated to enhancing your reading experience.
+""",
+    unsafe_allow_html=True,
 )
 
 st.subheader("How To Use MANGOLEAF", anchor=False)

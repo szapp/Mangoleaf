@@ -637,3 +637,43 @@ def add_sidebar_login():
                 st.sidebar.error("Registration failed")
 
         st.sidebar.info("Please log in to access the content")
+
+
+def add_social_links(who, padleft=True, padright=True):
+    """
+    Add social links for the developers
+
+    Parameters
+    ----------
+    who : str
+        Name of the developer to show the links for
+    """
+    # Social icons
+    github_img = """<img src="https://raw.githubusercontent.com/simple-icons/simple-icons/
+39e9b78c3b1d3a7be7b04cebb61d734443dd006a/icons/github.svg" class="social_github"
+    alt="GitHub" />"""
+    linkedin_img = """<img src="https://raw.githubusercontent.com/simple-icons/simple-icons/
+39e9b78c3b1d3a7be7b04cebb61d734443dd006a/icons/linkedin.svg" class="social_linkedin"
+    alt="LinkedIn" />"""
+
+    if who.lower() == "max":
+        linkedin = "maximyurchak"
+        github = "MaxYurch"
+    elif who.lower() in ("sören", "soren"):
+        linkedin = "szapp"
+        github = "szapp"
+    else:
+        raise ValueError(f"Unknown developer: {who}")
+
+    text = ""
+    if padleft:
+        text += "&nbsp;"
+
+    text += f"""<a href="https://github.com/{github}" rel="noopener noreferrer"
+    target="_blank">{github_img}</a>&nbsp; <a href="https://linkedin.com/in/{linkedin}"
+    rel="noopener noreferrer" target="_blank">{linkedin_img}</a>"""
+
+    if padright:
+        text += "&nbsp;"
+
+    return text

@@ -15,17 +15,22 @@ frontend.add_sidebar_logo()
 
 frontend.add_header_logo("Contact")
 
+# Social links
+social_max = frontend.add_social_links("max", True, True)
+social_soren = frontend.add_social_links("soren", True, True)
+
 st.title("**We'd Love to Hear from You!**", anchor=False)
 
 st.markdown(
-    """
+    f"""
 Are you passionate about books and manga? Have questions, feedback, or suggestions for us? Whether
 you're looking for the next great read or have some thoughts on our recommendations, we're here to
-listen. Max and Sören, our dedicated data scientists, are constantly working to enhance your
-reading experience. Your input is invaluable to us.
+listen. Max {social_max} and Sören {social_soren}, our dedicated data scientists, are constantly
+working to enhance your reading experience. Your input is invaluable to us.
 
 Drop us a message below, and let's start a conversation!
-"""
+""",
+    unsafe_allow_html=True,
 )
 
 st.header(":mailbox: Get In Touch With Us!", anchor=False)

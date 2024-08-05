@@ -348,3 +348,21 @@ div:has(> div > div > div > div > div > div > div.login_submit_spacer) div {
   width: unset!important;
   flex: unset;
 }
+
+/* Social link icons */
+img.social_github {
+  width: 0.9em;
+  margin-bottom: 4px;
+  filter: invert(100%);
+}
+img.social_linkedin {
+  width: 0.9em;
+  margin-bottom: 4px;
+  filter: invert(100%);
+}
+img.social_github:hover {
+  filter: invert(50%);
+}
+img.social_linkedin:hover {
+  filter: invert(29%) sepia(87%) saturate(1573%) hue-rotate(177deg) brightness(90%) contrast(101%);
+}
