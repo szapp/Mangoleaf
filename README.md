@@ -48,7 +48,7 @@ To offset this limitation, user ratings can be exported and downloaded as CSV fi
 - Implementing user authentication with hashed and salted passwords and base64-encoded, cropped user pictures
 - Automated scheduling with GitHub Action workflows
 
-## Languages, Tools, and Libraries
+## Languages, tools, and libraries
 
 - scikit-surprise
 - streamlit
@@ -63,7 +63,7 @@ To offset this limitation, user ratings can be exported and downloaded as CSV fi
 ## Schedule
 
 The project was implemented based on a well devised schedule of two and a half weeks.
-Implementation was done using agile methods including daily stand-ups, iterative implementations of minimally working examples, and weekly sprints/milestones.
+Implementation was done using agile methods including daily stand-ups, iterative implementation of minimally working examples, and weekly sprints/milestones.
 
 <div align="center">
 <picture>
@@ -71,6 +71,56 @@ Implementation was done using agile methods including daily stand-ups, iterative
   ![schedule](https://github.com/user-attachments/assets/13da011d-cd98-4512-b429-06d3ed1d9869)
 </picture>
 </div>
+
+## Database schema
+
+The database structure consists static tables, dynamic tables, and semi-dynamic tables, for both books and manga.
+
+- The static tables (`books` and `mangas`) are filled with the book and manga datasets.
+- The dynamic tables (`users` and `user_data`, `*_ratings`) are altered through user interactions.
+- The semi-dynamic tables (`*_popular`, `*_item_based`, `*_user_based`) are updated through scheduled GitHub Actions.
+
+<div align="center">
+<picture>
+
+  ![schema](https://github.com/user-attachments/assets/88afc170-d81d-47fa-93ee-cc61c1a38908)
+</picture>
+</div>
+
+## Repository structure
+
+```
+├── mangoleaf/               <- Source code of the Python package
+│   │
+│   ├── connection.py        <- Connection and interface with the database
+│   ├── query.py
+│   │
+│   ├── authentication.py    <- Authentication functions for the user accounts
+│   │
+│   ├── frontend.py          <- Functions for frontend components
+│   │
+│   └── recommend.py         <- Functions to query the recommendations from the database
+│
+├── notebooks/               <- Jupyter notebooks with exploratory data analysis and initial recommenders
+│
+├── requirements.txt         <- Dependencies for reproducing the environment
+│
+├── .streamlit/              <- Streamlit configuration
+│
+├── Home.py                  <- Pages, CSS, and images for the Streamlit app
+├── pages/
+├── style/
+├── images/
+│
+├── schema.sql               <- SQL scripts for creating and truncating the database structure
+├── reset_dynamic_tables.sql
+│
+├── create_schema.py         <- Python scripts to create, update, and reset the database
+├── reset_database.py
+├── update_database.py
+│
+└── .github/workflows/       <- Scheduled GitHub Action workflows to update and reset the database
+```
 
 ## Data sources
 
