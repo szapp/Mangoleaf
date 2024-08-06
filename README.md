@@ -81,8 +81,10 @@ The database structure consists static tables, dynamic tables, and semi-dynamic 
 - The semi-dynamic tables (`*_popular`, `*_item_based`, `*_user_based`) are updated through scheduled GitHub Actions.
 
 <div align="center">
+<picture>
 
   ![schema](https://github.com/user-attachments/assets/88afc170-d81d-47fa-93ee-cc61c1a38908)
+</picture>
 </div>
 
 ## Repository structure
