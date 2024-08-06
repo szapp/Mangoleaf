@@ -81,10 +81,8 @@ The database structure consists static tables, dynamic tables, and semi-dynamic 
 - The semi-dynamic tables (`*_popular`, `*_item_based`, `*_user_based`) are updated through scheduled GitHub Actions.
 
 <div align="center">
-<picture>
 
   ![schema](https://github.com/user-attachments/assets/88afc170-d81d-47fa-93ee-cc61c1a38908)
-</picture>
 </div>
 
 ## Repository structure
@@ -99,9 +97,9 @@ The database structure consists static tables, dynamic tables, and semi-dynamic 
 │   │
 │   ├── frontend.py          <- Functions for frontend components
 │   │
-│   └── recommend.py         <- Functions to query the recommendations from the database
+│   └── recommend.py         <- Functions to predict the recommendations
 │
-├── notebooks/               <- Jupyter notebooks with exploratory data analysis and initial recommenders
+├── notebooks/               <- Jupyter notebooks with EDA and initial recommenders
 │
 ├── requirements.txt         <- Dependencies for reproducing the environment
 │
@@ -119,7 +117,7 @@ The database structure consists static tables, dynamic tables, and semi-dynamic 
 ├── reset_database.py
 ├── update_database.py
 │
-└── .github/workflows/       <- Scheduled GitHub Action workflows to update and reset the database
+└── .github/workflows/       <- Scheduled GitHub Action workflows to update/reset the database
 ```
 
 ## Data sources
