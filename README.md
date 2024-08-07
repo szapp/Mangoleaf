@@ -23,10 +23,6 @@ Personal recommendations for books and mangas implemented using collaborative fi
 <a href="https://github.com/user-attachments/assets/1a4f6d30-4922-4538-9b3c-9f8e4cb009ac" target="_blank"><img src="https://github.com/user-attachments/assets/e9e43d70-ebe9-4fd9-a001-8f3098e4335c" alt="" width="40%" /></a>
 </div>
 
-## Authors
-
-[![Contributors](https://contrib.rocks/image?repo=szapp/Mangoleaf)](https://github.com/szapp/Mangoleaf/graphs/contributors)
-
 ## Project
 
 The goal of this project was to familiarize ourselves with and develop different recommender systems during a limited time of 2.5 weeks and clearly defined deliverable using agile methods.
@@ -38,13 +34,39 @@ For the sake of demonstration the datasets are limited to around 2000 items (aro
 To avoid spam and abuse in this demo project, user ratings are reset and user profiles are deleted every five days.
 To offset this limitation, user ratings can be exported and downloaded as CSV file at any time.
 
+## Authors
+
+[![Contributors](https://contrib.rocks/image?repo=szapp/Mangoleaf)](https://github.com/szapp/Mangoleaf/graphs/contributors)
+
+## Recommender implementation
+
+We trained and evaluated different recommenders for both the book and manga dataset. Below *user* is an individual, *item* refers to either a book or a manga, and a *rating* is a user score for each user-item combination.
+
+1. **Popularity recommender**:
+The ratings of all users are queried from the database and aggregated by average and count grouped by the items.
+Given a threshold of minimum number of ratings, the best average ratings are selected as the most popular items.
+In order of their rating they make up the popularity recommendation.
+
+2. **Item-based collaborative filtering recommender**:
+A collaborative filtering model is trained using the item ratings and their similarity matrix.
+The K-nearest neighbor (k-NN) inspired algorithm with a baseline ratings showed the most accuracy during model validation.
+For each item, the nearest neighbors are determined.
+These neighbors make up the the item-based, "you-might-also-like"-recommendation.
+
+3. **User-based collaborative filtering recommender**:
+Here, another baseline k-NN model is trained on the user ratings and their similarity matrix.
+For each user, the missing ratings constitute a testing set.
+The highest predicted ratings make up the user-based, personalized recommendation.
+
+Each of the recommendations were subsequently filtered to remove the items that a (logged-in) user has already rated to display only novel, meaningful reading suggestions on the user interface.
+
 ## Key learning
 
-- Project planning and collaborative work using agile methods
+- Project planning and collaborative working using agile methods
 - Balancing limited time against a working product
-- Working with different datasets and bring them into a consistent format
+- Working with different datasets and bringing them into a consistent format
 - Deploying a Streamlit app online
-- Implementing and maintain a PostgreSQL database
+- Implementing and maintaining a PostgreSQL database
 - Implementing user authentication with hashed and salted passwords and base64-encoded, cropped user pictures
 - Automated scheduling with GitHub Action workflows
 
@@ -74,11 +96,11 @@ Implementation was done using agile methods including daily stand-ups, iterative
 
 ## Database schema
 
-The database structure consists static tables, dynamic tables, and semi-dynamic tables, for both books and manga.
+The database structure is separated into static tables, dynamic tables, and semi-dynamic tables, for both books and manga.
 
-- The static tables (`books` and `mangas`) are filled with the book and manga datasets.
-- The dynamic tables (`users` and `user_data`, `*_ratings`) are altered through user interactions.
-- The semi-dynamic tables (`*_popular`, `*_item_based`, `*_user_based`) are updated through scheduled GitHub Actions.
+- The static tables (left and right: `books` and `mangas`) remain filled with the book and manga datasets. They are read-only.
+- The dynamic tables (center: `users` and `user_data`, `*_ratings`) are altered through user interactions.
+- The semi-dynamic tables (bottom row: `*_popular`, `*_item_based`, `*_user_based`) are updated through scheduled GitHub Actions and are otherwise read-only.
 
 <div align="center">
 <picture>
@@ -88,6 +110,8 @@ The database structure consists static tables, dynamic tables, and semi-dynamic 
 </div>
 
 ## Repository structure
+
+The repository contains the exploratory data analysis, the implementation of the recommenders, the database schema and SQL operations, and the code of the Streamlit web application. The core code of the project is organized into a Python package `mangoleaf`.
 
 ```
 ├── mangoleaf/               <- Source code of the Python package
