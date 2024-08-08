@@ -10,8 +10,6 @@ from mangoleaf import frontend
 
 frontend.add_config()
 frontend.add_style()
-frontend.add_sidebar_login()
-frontend.add_sidebar_logo()
 
 frontend.add_header_logo("Contact")
 
@@ -47,3 +45,7 @@ contact_form = f"""
 st.html(contact_form)
 
 st.image("images/mango_reading.png", width=550)
+
+# Add the login and logo to the sidebar in the end
+frontend.add_sidebar_login()
+frontend.add_sidebar_logo()
